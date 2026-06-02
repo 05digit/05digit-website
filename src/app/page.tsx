@@ -520,10 +520,10 @@ export default function Home() {
           {/* COLUMN 1: COVER ART & LINKS */}
           <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col ${
             isExpanded 
-              ? "w-full lg:w-1/3 opacity-100 scale-100" 
+              ? "w-full lg:w-[25%] opacity-100 scale-100" 
               : "w-0 h-0 lg:h-auto opacity-0 scale-95 overflow-hidden pointer-events-none absolute lg:static"
           }`}>
-            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 h-full justify-between">
+            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-6 h-full justify-center">
               
               {/* Cover Display */}
               <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
@@ -601,7 +601,7 @@ export default function Home() {
           {/* COLUMN 2: VIDEO & PLAYBACK SYSTEM */}
           <div className={`transition-all duration-700 ease-in-out flex flex-col ${
             isExpanded 
-              ? "w-full lg:w-1/3" 
+              ? "w-full lg:w-[50%]" 
               : "w-full lg:w-[65%] max-w-4xl mx-auto"
           }`}>
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 h-full justify-between">
@@ -671,10 +671,12 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* Playback Controls Row */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                {/* Playback Controls and Volume Row (Stacks vertically when expanded to prevent overflow) */}
+                <div className={`flex gap-3 transition-all duration-700 ease-in-out w-full ${
+                  isExpanded ? "flex-col" : "flex-col sm:flex-row items-center justify-between"
+                }`}>
                   
-                  {/* Core Player Buttons */}
+                  {/* Left part: Core Playback buttons */}
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={handlePrev}
@@ -698,15 +700,7 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {/* Toggle Cover/Tracklist */}
-                  <button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="px-5 py-1.5 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)]"
-                  >
-                    {isExpanded ? "COLLAPSE" : "MORE MUSIC"}
-                  </button>
-
-                  {/* Volume Slider Control */}
+                  {/* Right part: Volume slider */}
                   <div className="flex items-center gap-2 bg-[#0c0707] border border-[#1c0f10] px-2.5 py-1.5 rounded w-full sm:w-auto justify-center sm:justify-start">
                     <button
                       onClick={() => {
@@ -737,6 +731,16 @@ export default function Home() {
 
                 </div>
 
+                {/* Toggle Cover/Tracklist button - Animates position by moving down below controls when expanded */}
+                <div className="transition-all duration-700 ease-in-out w-full mt-1">
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="w-full py-2 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)]"
+                  >
+                    {isExpanded ? "COLLAPSE" : "MORE MUSIC"}
+                  </button>
+                </div>
+
                 {/* Progress Scrub Slider */}
                 <div className="space-y-0.5">
                   <div className="flex justify-between text-[8px] text-zinc-500 font-mono">
@@ -761,14 +765,14 @@ export default function Home() {
           {/* COLUMN 3: TRACKLIST */}
           <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col ${
             isExpanded 
-              ? "w-full lg:w-1/3 opacity-100 scale-100" 
+              ? "w-full lg:w-[25%] opacity-100 scale-100" 
               : "w-0 h-0 lg:h-auto opacity-0 scale-95 overflow-hidden pointer-events-none absolute lg:static"
           }`}>
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col h-full justify-between">
               
               <div className="flex flex-col flex-1 min-h-0">
                 <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">// TRACKLIST</span>
-                <div className="space-y-1.5 flex-1 overflow-y-auto max-h-[350px] lg:max-h-[360px] pr-1">
+                <div className="space-y-1.5 flex-1 overflow-y-auto pr-1">
                   {TRACKS.map((t, index) => {
                     const isActive = currentTrackIndex === index && !isTrailerActive;
                     return (
