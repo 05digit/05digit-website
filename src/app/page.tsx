@@ -156,6 +156,7 @@ export default function Home() {
   const [duration, setDuration] = useState<number>(0);
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
   const [activeVideoIndex, setActiveVideoIndex] = useState<number>(0);
+  const [visualizerMode, setVisualizerMode] = useState<"bars" | "wave">("bars");
   const activeVideoClip = VIDEO_CLIPS[activeVideoIndex];
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -167,13 +168,19 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const isPlayingRef = useRef<boolean>(false);
-
-  const activeTrack = TRACKS[currentTrackIndex];
+  const visualizerModeRef = useRef<"bars" | "wave">("bars");
 
   // Keep play state ref synced with react state to fix canvas closure issues
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
+
+  // Keep visualizer mode ref synced
+  useEffect(() => {
+    visualizerModeRef.current = visualizerMode;
+  }, [visualizerMode]);
+
+  const activeTrack = TRACKS[currentTrackIndex];
 
   // Initialize Web Audio context from user interaction
   const initAudioContext = () => {
@@ -339,41 +346,81 @@ export default function Home() {
       }
 
       if (analyserRef.current && isPlayingRef.current) {
-        analyserRef.current.getByteFrequencyData(dataArray);
+        if (visualizerModeRef.current === "bars") {
+          analyserRef.current.getByteFrequencyData(dataArray);
+        } else {
+          analyserRef.current.getByteTimeDomainData(dataArray);
+        }
       } else {
         // Idle pulsing
         const time = Date.now() * 0.004;
-        for (let i = 0; i < bufferLength; i++) {
-          dataArray[i] = Math.max(0, Math.sin(i * 0.15 + time) * 20 + 10 + Math.random() * 5);
+        if (visualizerModeRef.current === "bars") {
+          for (let i = 0; i < bufferLength; i++) {
+            dataArray[i] = Math.max(0, Math.sin(i * 0.15 + time) * 20 + 10 + Math.random() * 5);
+          }
+        } else {
+          for (let i = 0; i < bufferLength; i++) {
+            dataArray[i] = 128 + Math.sin(i * 0.2 + time) * 20 + Math.random() * 2;
+          }
         }
       }
 
-      const barWidth = (width / bufferLength) * 1.5;
-      let barHeight;
-      let x = 0;
+      if (visualizerModeRef.current === "bars") {
+        const barWidth = (width / bufferLength) * 1.5;
+        let barHeight;
+        let x = 0;
 
-      for (let i = 0; i < bufferLength; i++) {
-        barHeight = (dataArray[i] / 255) * height * 0.85;
+        for (let i = 0; i < bufferLength; i++) {
+          barHeight = (dataArray[i] / 255) * height * 0.85;
 
-        // Visualizer color: Red glow
-        const gradient = ctx.createLinearGradient(0, height, 0, height - barHeight);
-        gradient.addColorStop(0, "#2c0006");
-        gradient.addColorStop(0.5, "#8a0014");
-        gradient.addColorStop(1, "#ff0022");
+          // Visualizer color: Red glow
+          const gradient = ctx.createLinearGradient(0, height, 0, height - barHeight);
+          gradient.addColorStop(0, "#2c0006");
+          gradient.addColorStop(0.5, "#8a0014");
+          gradient.addColorStop(1, "#ff0022");
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
-        
-        // Neon red tip indicator
-        if (barHeight > 3) {
-          ctx.fillStyle = "#ff0022";
-          ctx.shadowBlur = 6;
-          ctx.shadowColor = "#ff0022";
-          ctx.fillRect(x, height - barHeight - 1.5, barWidth - 2, 1.5);
-          ctx.shadowBlur = 0;
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
+          
+          // Neon red tip indicator
+          if (barHeight > 3) {
+            ctx.fillStyle = "#ff0022";
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = "#ff0022";
+            ctx.fillRect(x, height - barHeight - 1.5, barWidth - 2, 1.5);
+            ctx.shadowBlur = 0;
+          }
+
+          x += barWidth;
+        }
+      } else {
+        // Oscilloscope Mode
+        ctx.beginPath();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#ff0022";
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = "#ff0022";
+
+        const sliceWidth = width / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          // Normalize to [0, 1] (time domain values are 0-255 centered at 128)
+          const v = dataArray[i] / 128.0;
+          const y = (v * height) / 2;
+
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+
+          x += sliceWidth;
         }
 
-        x += barWidth;
+        ctx.lineTo(width, height / 2);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
       }
     };
 
@@ -402,7 +449,60 @@ export default function Home() {
         onEnded={handleNext}
       />
 
-      {/* Header removed */}
+      {/* --- HEADER --- */}
+      <header className="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-md border-b border-[#160a0b] px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Left Status Label */}
+        <div className="flex items-center gap-2 text-[9px] text-zinc-500 font-mono tracking-widest sm:w-1/4 justify-center sm:justify-start">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff003c] opacity-75" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#ff003c]" />
+          </span>
+          <span>05_ONLINE</span>
+        </div>
+
+        {/* Centered Logo */}
+        <div className="flex justify-center sm:w-2/4">
+          <span className="text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] transition-all duration-300">
+            digit
+          </span>
+        </div>
+
+        {/* Right Social Redirect Matrix (Vibrant / Clean) */}
+        <div className="flex items-center justify-center sm:justify-end gap-5 text-[10px] md:text-xs font-mono font-bold tracking-widest text-zinc-400 sm:w-1/4">
+          <a 
+            href="https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="hover:text-[#1db954] hover:border-[#1db954] transition-all pb-0.5 border-b border-transparent"
+          >
+            SPOTIFY
+          </a>
+          <a 
+            href="https://music.apple.com/us/artist/digit/1524901037" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all pb-0.5 border-b border-transparent"
+          >
+            APPLE
+          </a>
+          <a 
+            href="https://www.youtube.com/@05digit" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="hover:text-[#ff0000] hover:border-[#ff0000] transition-all pb-0.5 border-b border-transparent"
+          >
+            YOUTUBE
+          </a>
+          <a 
+            href="https://www.instagram.com/05digit/" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="hover:text-[#e1306c] hover:border-[#e1306c] transition-all pb-0.5 border-b border-transparent"
+          >
+            INSTAGRAM
+          </a>
+        </div>
+      </header>
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
         
@@ -520,16 +620,22 @@ export default function Home() {
             </div>
 
             {/* Real Audio visualizer canvas */}
-            <div className="border border-[#2a1316] rounded bg-[#050505] p-2 relative">
+            <div className="border border-[#2a1316] rounded bg-[#050505] p-2 relative group">
               <canvas 
                 ref={canvasRef} 
                 width={500} 
                 height={55} 
                 className="w-full h-[55px] block opacity-95"
               />
-              <div className="absolute top-1 left-2 text-[8px] text-zinc-600 uppercase tracking-widest">
-                visualizer
+              <div className="absolute top-1.5 left-2.5 text-[8px] text-zinc-600 uppercase tracking-widest font-mono">
+                visualizer // {visualizerMode}
               </div>
+              <button 
+                onClick={() => setVisualizerMode(visualizerMode === "bars" ? "wave" : "bars")}
+                className="absolute top-1.5 right-2.5 text-[8px] text-zinc-500 hover:text-[#ff003c] border border-zinc-800 hover:border-[#ff003c] bg-black/60 px-1.5 py-0.5 rounded transition-all uppercase tracking-wider cursor-pointer font-mono"
+              >
+                toggle mode
+              </button>
             </div>
           </div>
 
