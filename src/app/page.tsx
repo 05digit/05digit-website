@@ -184,7 +184,8 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
-  const [isTrailerActive, setIsTrailerActive] = useState<boolean>(false);
+  const [isTrailerActive, setIsTrailerActive] = useState<boolean>(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.8);
 
   const ytPlayerRef = useRef<any>(null);
@@ -498,278 +499,312 @@ export default function Home() {
       <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
         
         {/* --- MUSIC & VIDEO SYSTEM --- */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16 items-stretch">
+        <div className="flex flex-col lg:flex-row gap-6 mb-16 items-stretch justify-center w-full min-h-[480px]">
           
-          {/* COLUMN 1: VIDEO & PLAYBACK SYSTEM (lg:col-span-8) */}
-          <div className="lg:col-span-8 flex flex-col gap-4">
-            
-            {/* Unified Video Box */}
-            <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
-              {/* Target div for YouTube player loading */}
-              <div className="relative aspect-video w-full rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
-                <div id="yt-player" className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
+          {/* COLUMN 1: COVER ART & LINKS */}
+          <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col ${
+            isExpanded 
+              ? "w-full lg:w-1/3 opacity-100 scale-100" 
+              : "w-0 h-0 lg:h-auto opacity-0 scale-95 overflow-hidden pointer-events-none absolute lg:static"
+          }`}>
+            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 h-full justify-between">
+              
+              {/* Cover Display */}
+              <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
+                <Image
+                  src={activeTrack.coverUrl}
+                  alt={activeTrack.title}
+                  fill
+                  priority
+                  className={`object-cover transition-transform duration-700 filter saturate-60 group-hover:saturate-100 ${isPlaying ? "scale-105" : "scale-100"}`}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
                 
-                {/* Visual Video Shade */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-90 pointer-events-none" />
-
-                {/* Trailer Switcher Overlay (Top Left) */}
-                <div className="absolute top-3 left-3 z-20">
-                  <button
-                    onClick={handleToggleTrailer}
-                    className={`px-2.5 py-1 rounded text-[7px] font-mono font-bold tracking-widest border transition-all duration-300 active:scale-95 cursor-pointer ${
-                      isTrailerActive
-                        ? "bg-[#ff003c] text-black border-[#ff003c] shadow-[0_0_8px_#ff003c]"
-                        : "bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white"
-                    }`}
-                  >
-                    {isTrailerActive ? "SHOW TRACK VIDEO" : "WATCH TRAILER"}
-                  </button>
+                <div className="absolute bottom-3 left-3">
+                  <h3 className="text-xl font-normal text-white font-sidewalk tracking-wide">{activeTrack.title}</h3>
+                  {activeTrack.feature && (
+                    <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-0.5 uppercase">{activeTrack.feature}</p>
+                  )}
+                  <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">{activeTrack.album}</p>
                 </div>
+              </div>
 
-                {/* Mute button overlay (Top Right) */}
-                <div className="absolute top-3 right-3 z-20">
-                  <button
-                    onClick={() => {
-                      setIsVideoMuted(!isVideoMuted);
-                      track("click_video_mute_toggle", { muted: !isVideoMuted });
-                    }}
-                    className="bg-black/85 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1 rounded-full transition-all duration-300 active:scale-95 cursor-pointer"
-                    aria-label="Mute Toggle"
+              {/* Song Links in Bigger Colors */}
+              <div className="grid grid-cols-3 gap-2">
+                {activeTrack.spotifyUrl ? (
+                  <a
+                    href={activeTrack.spotifyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("click_track_spotify", { track_title: activeTrack.title })}
+                    className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
                   >
-                    {isVideoMuted ? <VolumeX size={12} className="text-[#ff003c]" /> : <Volume2 size={12} />}
-                  </button>
-                </div>
+                    <span>SPOTIFY</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                    N/A
+                  </div>
+                )}
 
+                {activeTrack.appleMusicUrl ? (
+                  <a
+                    href={activeTrack.appleMusicUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("click_track_apple", { track_title: activeTrack.title })}
+                    className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                  >
+                    <span>APPLE</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                    N/A
+                  </div>
+                )}
+
+                {activeTrack.youtubeUrl ? (
+                  <a
+                    href={activeTrack.youtubeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("click_track_youtube", { track_title: activeTrack.title })}
+                    className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                  >
+                    <span>YOUTUBE</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                    N/A
+                  </div>
+                )}
               </div>
             </div>
+          </div>
 
-            {/* Player controls */}
-            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-3 justify-between flex-1">
+          {/* COLUMN 2: VIDEO & PLAYBACK SYSTEM */}
+          <div className={`transition-all duration-700 ease-in-out flex flex-col ${
+            isExpanded 
+              ? "w-full lg:w-1/3" 
+              : "w-full lg:w-[65%] max-w-4xl mx-auto"
+          }`}>
+            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 h-full justify-between">
               
-              {/* Current Track Readout */}
-              <div className="flex flex-col gap-0.5 border-b border-[#1b0d0e] pb-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[8px] text-[#ff003c] font-mono tracking-widest uppercase">// NOW PLAYING</span>
-                  <span className="h-[1px] w-4 bg-[#2a1316]" />
-                  <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL TRAILER" : activeTrack.videoBadge}</span>
+              {/* Unified Video Box */}
+              <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
+                {/* Target div for YouTube player loading */}
+                <div className="relative aspect-video w-full rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
+                  <div id="yt-player" className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
+                  
+                  {/* Visual Video Shade */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-90 pointer-events-none" />
+
+                  {/* Trailer Switcher Overlay (Top Left) */}
+                  <div className="absolute top-3 left-3 z-20">
+                    <button
+                      onClick={handleToggleTrailer}
+                      className={`px-2.5 py-1 rounded text-[7px] font-mono font-bold tracking-widest border transition-all duration-300 active:scale-95 cursor-pointer ${
+                        isTrailerActive
+                          ? "bg-[#ff003c] text-black border-[#ff003c] shadow-[0_0_8px_#ff003c]"
+                          : "bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white"
+                      }`}
+                    >
+                      {isTrailerActive ? "SHOW TRACK VIDEO" : "WATCH TRAILER"}
+                    </button>
+                  </div>
+
+                  {/* Mute button overlay (Top Right) */}
+                  <div className="absolute top-3 right-3 z-20">
+                    <button
+                      onClick={() => {
+                        setIsVideoMuted(!isVideoMuted);
+                        track("click_video_mute_toggle", { muted: !isVideoMuted });
+                      }}
+                      className="bg-black/85 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1 rounded-full transition-all duration-300 active:scale-95 cursor-pointer"
+                      aria-label="Mute Toggle"
+                    >
+                      {isVideoMuted ? <VolumeX size={12} className="text-[#ff003c]" /> : <Volume2 size={12} />}
+                    </button>
+                  </div>
+
                 </div>
-                <h2 className="text-xl font-normal text-white uppercase font-sidewalk tracking-wide mt-0.5">
-                  {isTrailerActive ? "Digit" : activeTrack.title}
-                  {!isTrailerActive && activeTrack.feature && (
-                    <span className="text-xs text-zinc-500 font-mono tracking-wider uppercase ml-2">
-                      {activeTrack.feature}
-                    </span>
-                  )}
-                </h2>
               </div>
 
-              {/* Playback Controls Row */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              {/* Player controls */}
+              <div className="flex flex-col gap-3 justify-between flex-1 mt-2">
                 
-                {/* Core Player Buttons */}
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={handlePrev}
-                    className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
-                  >
-                    <SkipBack size={12} />
-                  </button>
-
-                  <button 
-                    onClick={handlePlayPause}
-                    className="px-5 py-1.5 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-[8px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(255,0,60,0.35)] cursor-pointer"
-                  >
-                    {isPlaying ? "PAUSE" : "PLAY"}
-                  </button>
-
-                  <button 
-                    onClick={handleNext}
-                    className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
-                  >
-                    <SkipForward size={12} />
-                  </button>
+                {/* Current Track Readout */}
+                <div className="flex flex-col gap-0.5 border-b border-[#1b0d0e] pb-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] text-[#ff003c] font-mono tracking-widest uppercase">// NOW PLAYING</span>
+                    <span className="h-[1px] w-4 bg-[#2a1316]" />
+                    <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL ARTIST TRAILER" : activeTrack.videoBadge}</span>
+                  </div>
+                  <h2 className="text-xl font-normal text-white uppercase font-sidewalk tracking-wide mt-0.5">
+                    {isTrailerActive ? "Digit" : activeTrack.title}
+                    {!isTrailerActive && activeTrack.feature && (
+                      <span className="text-xs text-zinc-500 font-mono tracking-wider uppercase ml-2">
+                        {activeTrack.feature}
+                      </span>
+                    )}
+                  </h2>
+                  {isTrailerActive && (
+                    <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-1 uppercase">
+                      Background Track: <span className="text-[#ff003c] font-bold">Pasukta galva</span>
+                    </p>
+                  )}
                 </div>
 
-                {/* Volume Slider Control */}
-                <div className="flex items-center gap-2 bg-[#0c0707] border border-[#1c0f10] px-2.5 py-1.5 rounded w-full sm:w-auto justify-center sm:justify-start">
+                {/* Playback Controls Row */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                  
+                  {/* Core Player Buttons */}
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={handlePrev}
+                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                    >
+                      <SkipBack size={12} />
+                    </button>
+
+                    <button 
+                      onClick={handlePlayPause}
+                      className="px-5 py-1.5 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-[8px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(255,0,60,0.35)] cursor-pointer"
+                    >
+                      {isPlaying ? "PAUSE" : "PLAY"}
+                    </button>
+
+                    <button 
+                      onClick={handleNext}
+                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                    >
+                      <SkipForward size={12} />
+                    </button>
+                  </div>
+
+                  {/* Toggle Cover/Tracklist */}
                   <button
-                    onClick={() => {
-                      const nextVolume = volume === 0 ? 0.8 : 0;
-                      setVolume(nextVolume);
-                      track("click_volume_toggle", { muted: nextVolume === 0 });
-                    }}
-                    className="text-zinc-500 hover:text-[#ff003c] transition-colors shrink-0 active:scale-95 cursor-pointer"
-                    aria-label="Volume Toggle"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="px-5 py-1.5 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)]"
                   >
-                    {volume === 0 ? <VolumeX size={11} className="text-[#ff003c]" /> : <Volume2 size={11} />}
+                    {isExpanded ? "COLLAPSE" : "MORE MUSIC"}
                   </button>
+
+                  {/* Volume Slider Control */}
+                  <div className="flex items-center gap-2 bg-[#0c0707] border border-[#1c0f10] px-2.5 py-1.5 rounded w-full sm:w-auto justify-center sm:justify-start">
+                    <button
+                      onClick={() => {
+                        const nextVolume = volume === 0 ? 0.8 : 0;
+                        setVolume(nextVolume);
+                        track("click_volume_toggle", { muted: nextVolume === 0 });
+                      }}
+                      className="text-zinc-500 hover:text-[#ff003c] transition-colors shrink-0 active:scale-95 cursor-pointer"
+                      aria-label="Volume Toggle"
+                    >
+                      {volume === 0 ? <VolumeX size={11} className="text-[#ff003c]" /> : <Volume2 size={11} />}
+                    </button>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={volume}
+                      onChange={(e) => setVolume(parseFloat(e.target.value))}
+                      onMouseUp={() => track("change_volume", { volume_level: volume })}
+                      onTouchEnd={() => track("change_volume", { volume_level: volume })}
+                      className="w-16 h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
+                    />
+                    <span className="text-[8px] text-zinc-500 font-mono w-5 text-right shrink-0">
+                      {Math.round(volume * 100)}%
+                    </span>
+                  </div>
+
+                </div>
+
+                {/* Progress Scrub Slider */}
+                <div className="space-y-0.5">
+                  <div className="flex justify-between text-[8px] text-zinc-500 font-mono">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
+                  </div>
                   <input
                     type="range"
                     min="0"
-                    max="1"
-                    step="0.05"
-                    value={volume}
-                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    onMouseUp={() => track("change_volume", { volume_level: volume })}
-                    onTouchEnd={() => track("change_volume", { volume_level: volume })}
-                    className="w-16 h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
+                    max={duration || 100}
+                    value={currentTime}
+                    onChange={handleScrub}
+                    className="w-full h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
                   />
-                  <span className="text-[8px] text-zinc-500 font-mono w-5 text-right shrink-0">
-                    {Math.round(volume * 100)}%
-                  </span>
                 </div>
 
-              </div>
-
-              {/* Progress Scrub Slider */}
-              <div className="space-y-0.5">
-                <div className="flex justify-between text-[8px] text-zinc-500 font-mono">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(duration)}</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max={duration || 100}
-                  value={currentTime}
-                  onChange={handleScrub}
-                  className="w-full h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
-                />
               </div>
 
             </div>
-
           </div>
 
-          {/* COLUMN 2: COVER, TRACKLIST & STREAM LINKS (lg:col-span-4) */}
-          <div className="lg:col-span-4 border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 self-stretch">
-            
-            {/* Cover Display */}
-            <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
-              <Image
-                src={activeTrack.coverUrl}
-                alt={activeTrack.title}
-                fill
-                priority
-                className={`object-cover transition-transform duration-700 filter saturate-60 group-hover:saturate-100 ${isPlaying ? "scale-105" : "scale-100"}`}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
+          {/* COLUMN 3: TRACKLIST */}
+          <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col ${
+            isExpanded 
+              ? "w-full lg:w-1/3 opacity-100 scale-100" 
+              : "w-0 h-0 lg:h-auto opacity-0 scale-95 overflow-hidden pointer-events-none absolute lg:static"
+          }`}>
+            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col h-full justify-between">
               
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-xl font-normal text-white font-sidewalk tracking-wide">{activeTrack.title}</h3>
-                {activeTrack.feature && (
-                  <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-0.5 uppercase">{activeTrack.feature}</p>
-                )}
-                <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">{activeTrack.album}</p>
-              </div>
-            </div>
-
-            {/* Song Links in Bigger Colors */}
-            <div className="grid grid-cols-3 gap-2">
-              {activeTrack.spotifyUrl ? (
-                <a
-                  href={activeTrack.spotifyUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => track("click_track_spotify", { track_title: activeTrack.title })}
-                  className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
-                >
-                  <span>SPOTIFY</span>
-                </a>
-              ) : (
-                <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
-                  N/A
-                </div>
-              )}
-
-              {activeTrack.appleMusicUrl ? (
-                <a
-                  href={activeTrack.appleMusicUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => track("click_track_apple", { track_title: activeTrack.title })}
-                  className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
-                >
-                  <span>APPLE</span>
-                </a>
-              ) : (
-                <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
-                  N/A
-                </div>
-              )}
-
-              {activeTrack.youtubeUrl ? (
-                <a
-                  href={activeTrack.youtubeUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => track("click_track_youtube", { track_title: activeTrack.title })}
-                  className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
-                >
-                  <span>YOUTUBE</span>
-                </a>
-              ) : (
-                <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
-                  N/A
-                </div>
-              )}
-            </div>
-
-            {/* Interactive Tracklist Selector */}
-            <div className="flex flex-col flex-1 min-h-0 border-t border-[#1b0d0e] pt-4">
-              <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">// TRACKLIST</span>
-              <div className="space-y-1.5 flex-1 overflow-y-auto max-h-[350px] lg:max-h-[360px] pr-1">
-                {TRACKS.map((t, index) => {
-                  const isActive = currentTrackIndex === index && !isTrailerActive;
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => selectTrack(index)}
-                      className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border ${
-                        isActive 
-                          ? "bg-[#ff003c]/10 border-[#ff003c]/30 text-white" 
-                          : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between min-w-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className={`text-[8px] font-mono ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-                          <span className={`font-sidewalk text-sm tracking-wide truncate ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>
-                            {t.title}
-                          </span>
+              <div className="flex flex-col flex-1 min-h-0">
+                <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">// TRACKLIST</span>
+                <div className="space-y-1.5 flex-1 overflow-y-auto max-h-[350px] lg:max-h-[360px] pr-1">
+                  {TRACKS.map((t, index) => {
+                    const isActive = currentTrackIndex === index && !isTrailerActive;
+                    return (
+                      <div
+                        key={t.id}
+                        onClick={() => selectTrack(index)}
+                        className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border ${
+                          isActive 
+                            ? "bg-[#ff003c]/10 border-[#ff003c]/30 text-white" 
+                            : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between min-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className={`text-[8px] font-mono ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+                            <span className={`font-sidewalk text-sm tracking-wide truncate ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>
+                              {t.title}
+                            </span>
+                          </div>
+                          
+                          {isActive && isPlaying ? (
+                            <div className="flex items-end gap-0.5 h-2 w-3.5 justify-end shrink-0">
+                              <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
+                              <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
+                              <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
+                            </div>
+                          ) : (
+                            <span className="text-[8px] text-zinc-500 font-mono shrink-0">{t.duration}</span>
+                          )}
                         </div>
                         
-                        {isActive && isPlaying ? (
-                          <div className="flex items-end gap-0.5 h-2 w-3.5 justify-end shrink-0">
-                            <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
-                            <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
-                            <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
+                        {t.feature && (
+                          <div className="text-[8px] text-zinc-500 font-mono pl-4 mt-0.5 lowercase">
+                            {t.feature}
                           </div>
-                        ) : (
-                          <span className="text-[8px] text-zinc-500 font-mono shrink-0">{t.duration}</span>
                         )}
-                      </div>
-                      
-                      {t.feature && (
-                        <div className="text-[8px] text-zinc-500 font-mono pl-4 mt-0.5 lowercase">
-                          {t.feature}
+                        
+                        <div className="text-[8px] text-zinc-600 font-sans tracking-wide pl-4 mt-0.5">
+                          {t.album.includes("(") ? t.album.split("(")[0].trim() : t.album}
                         </div>
-                      )}
-                      
-                      <div className="text-[8px] text-zinc-600 font-sans tracking-wide pl-4 mt-0.5">
-                        {t.album.includes("(") ? t.album.split("(")[0].trim() : t.album}
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
+            </div>
           </div>
 
-        </section>
+        </div>
 
         {/* --- BIO SECTION --- */}
         <section className="mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-[#1a1112] pt-12">
