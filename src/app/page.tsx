@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Play, Pause, SkipForward, SkipBack, Disc, Headphones, Radio, Volume2, VolumeX } from "lucide-react";
+import { track } from "@vercel/analytics";
 
 // --- Types ---
 interface Track {
@@ -27,7 +28,7 @@ const TRACKS: Track[] = [
     audioUrl: "/songs/primityva v2.wav",
     duration: "2:50",
     spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
-    appleMusicUrl: "https://music.apple.com/us/album/primityva-single/1557022026",
+    appleMusicUrl: "https://music.apple.com/us/artist/digit/1524901037",
     youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8"
   },
   {
@@ -39,7 +40,7 @@ const TRACKS: Track[] = [
     audioUrl: "/songs/nebeskambink final .wav",
     duration: "2:40",
     spotifyUrl: "https://open.spotify.com/track/2ljYOhOpy6TTgy2UFxZKRN?si=3bf9a6c9cca84fbf",
-    appleMusicUrl: "https://music.apple.com/us/album/nebeskambink-single/1801874212",
+    appleMusicUrl: "https://music.apple.com/us/album/nebeskambink-single/1810770309",
     youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8"
   },
   {
@@ -51,7 +52,7 @@ const TRACKS: Track[] = [
     audioUrl: "/songs/apakau feat atikin.wav",
     duration: "2:15",
     spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
-    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1769854728",
+    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1804514772",
     youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c"
   },
   {
@@ -62,7 +63,7 @@ const TRACKS: Track[] = [
     audioUrl: "/songs/perfect v4_Master.wav",
     duration: "3:05",
     spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
-    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1769854728",
+    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1804514772",
     youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4"
   }
 ];
@@ -157,6 +158,7 @@ export default function Home() {
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
   const [activeVideoIndex, setActiveVideoIndex] = useState<number>(0);
   const [visualizerMode, setVisualizerMode] = useState<"bars" | "wave">("bars");
+  const [volume, setVolume] = useState<number>(0.8);
   const activeVideoClip = VIDEO_CLIPS[activeVideoIndex];
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -179,6 +181,38 @@ export default function Home() {
   useEffect(() => {
     visualizerModeRef.current = visualizerMode;
   }, [visualizerMode]);
+
+  // Sync volume level to HTML5 audio node
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume, currentTrackIndex]);
+
+  // Session duration tracking / milestones
+  useEffect(() => {
+    const startTime = Date.now();
+    const milestones = [15, 30, 60, 120, 300, 600, 1200, 1800];
+    const timers: NodeJS.Timeout[] = [];
+
+    milestones.forEach((seconds) => {
+      const t = setTimeout(() => {
+        track("session_duration_milestone", {
+          duration_seconds: seconds,
+          duration_formatted: seconds >= 60 ? `${seconds / 60}m` : `${seconds}s`
+        });
+      }, seconds * 1000);
+      timers.push(t);
+    });
+
+    return () => {
+      timers.forEach(clearTimeout);
+      const totalElapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+      if (totalElapsedSeconds > 2) {
+        track("session_end", { total_seconds: totalElapsedSeconds });
+      }
+    };
+  }, []);
 
   const activeTrack = TRACKS[currentTrackIndex];
 
@@ -209,6 +243,7 @@ export default function Home() {
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      track("audio_pause", { track_title: activeTrack.title });
     } else {
       // Resume AudioContext if suspended (browser security)
       if (audioContextRef.current && audioContextRef.current.state === "suspended") {
@@ -216,6 +251,7 @@ export default function Home() {
       }
       audioRef.current.play().then(() => {
         setIsPlaying(true);
+        track("audio_play", { track_title: activeTrack.title });
       }).catch(err => {
         console.error("Playback failed", err);
       });
@@ -225,6 +261,7 @@ export default function Home() {
   const handleNext = () => {
     const wasPlaying = isPlaying;
     const nextIndex = (currentTrackIndex + 1) % TRACKS.length;
+    const nextTrack = TRACKS[nextIndex];
     
     if (audioRef.current) {
       audioRef.current.pause();
@@ -232,6 +269,7 @@ export default function Home() {
     setCurrentTrackIndex(nextIndex);
     setCurrentTime(0);
     setIsPlaying(false);
+    track("skip_next", { track_title: nextTrack.title });
 
     if (wasPlaying && audioRef.current) {
       // Small timeout to let source switch src cleanly
@@ -249,6 +287,7 @@ export default function Home() {
   const handlePrev = () => {
     const wasPlaying = isPlaying;
     const prevIndex = (currentTrackIndex - 1 + TRACKS.length) % TRACKS.length;
+    const prevTrack = TRACKS[prevIndex];
     
     if (audioRef.current) {
       audioRef.current.pause();
@@ -256,6 +295,7 @@ export default function Home() {
     setCurrentTrackIndex(prevIndex);
     setCurrentTime(0);
     setIsPlaying(false);
+    track("skip_prev", { track_title: prevTrack.title });
 
     if (wasPlaying && audioRef.current) {
       setTimeout(() => {
@@ -271,12 +311,14 @@ export default function Home() {
 
   const selectTrack = (index: number) => {
     const wasPlaying = isPlaying;
+    const targetTrack = TRACKS[index];
     if (audioRef.current) {
       audioRef.current.pause();
     }
     setCurrentTrackIndex(index);
     setCurrentTime(0);
     setIsPlaying(false);
+    track("select_track", { track_title: targetTrack.title });
 
     if (wasPlaying && audioRef.current) {
       setTimeout(() => {
@@ -473,6 +515,7 @@ export default function Home() {
             href="https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw" 
             target="_blank" 
             rel="noreferrer" 
+            onClick={() => track("click_header_spotify")}
             className="hover:text-[#1db954] hover:border-[#1db954] transition-all pb-0.5 border-b border-transparent"
           >
             SPOTIFY
@@ -481,6 +524,7 @@ export default function Home() {
             href="https://music.apple.com/us/artist/digit/1524901037" 
             target="_blank" 
             rel="noreferrer" 
+            onClick={() => track("click_header_apple")}
             className="hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all pb-0.5 border-b border-transparent"
           >
             APPLE
@@ -489,6 +533,7 @@ export default function Home() {
             href="https://www.youtube.com/@05digit" 
             target="_blank" 
             rel="noreferrer" 
+            onClick={() => track("click_header_youtube")}
             className="hover:text-[#ff0000] hover:border-[#ff0000] transition-all pb-0.5 border-b border-transparent"
           >
             YOUTUBE
@@ -497,6 +542,7 @@ export default function Home() {
             href="https://www.instagram.com/05digit/" 
             target="_blank" 
             rel="noreferrer" 
+            onClick={() => track("click_header_instagram")}
             className="hover:text-[#e1306c] hover:border-[#e1306c] transition-all pb-0.5 border-b border-transparent"
           >
             INSTAGRAM
@@ -527,7 +573,10 @@ export default function Home() {
 
               {/* Left Carousel Navigation */}
               <button
-                onClick={() => setActiveVideoIndex((prev) => (prev - 1 + VIDEO_CLIPS.length) % VIDEO_CLIPS.length)}
+                onClick={() => {
+                  setActiveVideoIndex((prev) => (prev - 1 + VIDEO_CLIPS.length) % VIDEO_CLIPS.length);
+                  track("click_video_prev", { current_clip: activeVideoClip.title });
+                }}
                 className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 border border-[#3e1d21] hover:border-[#ff003c] text-white p-2 rounded-full transition-all duration-300 z-20 active:scale-95"
                 aria-label="Previous Clip"
               >
@@ -538,7 +587,10 @@ export default function Home() {
 
               {/* Right Carousel Navigation */}
               <button
-                onClick={() => setActiveVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length)}
+                onClick={() => {
+                  setActiveVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length);
+                  track("click_video_next", { current_clip: activeVideoClip.title });
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 border border-[#3e1d21] hover:border-[#ff003c] text-white p-2 rounded-full transition-all duration-300 z-20 active:scale-95"
                 aria-label="Next Clip"
               >
@@ -547,27 +599,30 @@ export default function Home() {
                 </svg>
               </button>
 
-              {/* Title Overlay in Pretty Sidewalk Font - Bounding padding added to prevent top cutoff */}
-              <div className="absolute bottom-6 left-6 md:left-8 pointer-events-none select-none z-10 max-w-[80%] md:max-w-none">
+              {/* Title Overlay in Pretty Sidewalk Font - Centered on video to make YouTube player controls visible */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-10 text-center w-full max-w-[85%] px-4">
                 <span className="text-[9px] md:text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-1.5 font-sans">
                   {activeVideoClip.badge}
                 </span>
-                <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-snug py-1">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-tight py-1">
                   {activeVideoClip.title}
                 </h1>
                 {activeVideoClip.feature && (
-                  <div className="text-xs sm:text-sm md:text-base text-zinc-400 font-mono tracking-wider uppercase -mt-1 pb-1">
+                  <div className="text-xs sm:text-sm md:text-base text-zinc-400 font-mono tracking-wider uppercase mt-1">
                     {activeVideoClip.feature}
                   </div>
                 )}
               </div>
 
-              {/* Carousel Indicators */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
+              {/* Carousel Indicators (Moved to top center to not block YouTube player controls) */}
+              <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
                 {VIDEO_CLIPS.map((_, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setActiveVideoIndex(idx)}
+                    onClick={() => {
+                      setActiveVideoIndex(idx);
+                      track("click_video_indicator", { target_index: idx, target_clip: VIDEO_CLIPS[idx].title });
+                    }}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       activeVideoIndex === idx 
                         ? "w-4 bg-[#ff003c] shadow-[0_0_8px_#ff003c]" 
@@ -578,10 +633,13 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Video control toggles */}
-              <div className="absolute bottom-6 right-6 flex items-center gap-2 z-20">
+              {/* Video control toggles (Moved to top right to not block YouTube player controls) */}
+              <div className="absolute top-6 right-6 flex items-center gap-2 z-20">
                 <button
-                  onClick={() => setIsVideoMuted(!isVideoMuted)}
+                  onClick={() => {
+                    setIsVideoMuted(!isVideoMuted);
+                    track("click_video_mute_toggle", { muted: !isVideoMuted });
+                  }}
                   className="bg-black/85 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95"
                   aria-label="Mute Toggle"
                 >
@@ -631,7 +689,11 @@ export default function Home() {
                 visualizer // {visualizerMode}
               </div>
               <button 
-                onClick={() => setVisualizerMode(visualizerMode === "bars" ? "wave" : "bars")}
+                onClick={() => {
+                  const nextMode = visualizerMode === "bars" ? "wave" : "bars";
+                  setVisualizerMode(nextMode);
+                  track("click_visualizer_toggle_mode", { target_mode: nextMode });
+                }}
                 className="absolute top-1.5 right-2.5 text-[8px] text-zinc-500 hover:text-[#ff003c] border border-zinc-800 hover:border-[#ff003c] bg-black/60 px-1.5 py-0.5 rounded transition-all uppercase tracking-wider cursor-pointer font-mono"
               >
                 toggle mode
@@ -670,32 +732,66 @@ export default function Home() {
                   max={duration || 100}
                   value={currentTime}
                   onChange={handleScrub}
+                  onMouseUp={() => track("audio_scrub", { scrub_time: currentTime, track_title: activeTrack.title })}
+                  onTouchEnd={() => track("audio_scrub", { scrub_time: currentTime, track_title: activeTrack.title })}
                   className="w-full h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
                 />
               </div>
 
               {/* Player Controllers */}
-              <div className="flex items-center justify-between mb-5">
-                <button 
-                  onClick={handlePrev}
-                  className="p-2.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95"
-                >
-                  <SkipBack size={15} />
-                </button>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-5">
+                {/* Playback buttons */}
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={handlePrev}
+                    className="p-2.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95"
+                  >
+                    <SkipBack size={15} />
+                  </button>
 
-                <button 
-                  onClick={handlePlayPause}
-                  className="px-8 py-3 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-xs uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,0,60,0.35)]"
-                >
-                  {isPlaying ? "PAUSE" : "PLAY"}
-                </button>
+                  <button 
+                    onClick={handlePlayPause}
+                    className="px-8 py-3 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-xs uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,0,60,0.35)]"
+                  >
+                    {isPlaying ? "PAUSE" : "PLAY"}
+                  </button>
 
-                <button 
-                  onClick={handleNext}
-                  className="p-2.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95"
-                >
-                  <SkipForward size={15} />
-                </button>
+                  <button 
+                    onClick={handleNext}
+                    className="p-2.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95"
+                  >
+                    <SkipForward size={15} />
+                  </button>
+                </div>
+
+                {/* Volume Slider Control */}
+                <div className="flex items-center gap-2 bg-[#0c0707] border border-[#1c0f10] px-3 py-1.5 rounded w-full sm:w-auto justify-center sm:justify-start">
+                  <button
+                    onClick={() => {
+                      const nextVolume = volume === 0 ? 0.8 : 0;
+                      setVolume(nextVolume);
+                      track("click_volume_toggle", { muted: nextVolume === 0 });
+                    }}
+                    className="text-zinc-500 hover:text-[#ff003c] transition-colors shrink-0 active:scale-95"
+                    aria-label="Volume Toggle"
+                  >
+                    {volume === 0 ? <VolumeX size={13} className="text-[#ff003c]" /> : <Volume2 size={13} />}
+                  </button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={volume}
+                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                    onMouseUp={() => track("change_volume", { volume_level: volume })}
+                    onTouchEnd={() => track("change_volume", { volume_level: volume })}
+                    className="w-24 h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
+                  />
+                  <span className="text-[9px] text-zinc-500 font-mono w-7 text-right shrink-0">
+                    {Math.round(volume * 100)}%
+                  </span>
+                </div>
               </div>
 
               {/* WAV Notice */}
@@ -711,13 +807,13 @@ export default function Home() {
             <div className="border border-[#221012] bg-[#0a0505] p-5 rounded-lg flex-1">
               <span className="text-[10px] text-zinc-500 uppercase tracking-widest block mb-4 font-sans">tracklist</span>
               <div className="space-y-2">
-                {TRACKS.map((track, index) => {
+                {TRACKS.map((t, index) => {
                   const isActive = currentTrackIndex === index;
                   return (
-                    <button
-                      key={track.id}
+                    <div
+                      key={t.id}
                       onClick={() => selectTrack(index)}
-                      className={`w-full flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded transition-all text-left gap-3 ${
+                      className={`w-full flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded transition-all text-left gap-3 cursor-pointer ${
                         isActive 
                           ? "bg-[#ff003c]/10 border border-[#ff003c]/30 text-white" 
                           : "bg-black/40 border border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
@@ -728,40 +824,43 @@ export default function Home() {
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <div className="min-w-0">
-                          <div className={`font-sidewalk text-base tracking-wide ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>{track.title}</div>
-                          {track.feature && (
-                            <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{track.feature}</div>
+                          <div className={`font-sidewalk text-base tracking-wide ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>{t.title}</div>
+                          {t.feature && (
+                            <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{t.feature}</div>
                           )}
-                          <div className="text-[9px] text-zinc-500 tracking-wider mt-0.5">{track.album}</div>
+                          <div className="text-[9px] text-zinc-500 tracking-wider mt-0.5">{t.album}</div>
                         </div>
                       </div>
                       <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                         <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                          {track.spotifyUrl && (
+                          {t.spotifyUrl && (
                             <a
-                              href={track.spotifyUrl}
+                              href={t.spotifyUrl}
                               target="_blank"
                               rel="noreferrer"
+                              onClick={() => track("click_track_spotify", { track_title: t.title })}
                               className="text-[8px] text-zinc-500 hover:text-[#1db954] hover:border-[#1db954] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
                             >
                               spotify
                             </a>
                           )}
-                          {track.appleMusicUrl && (
+                          {t.appleMusicUrl && (
                             <a
-                              href={track.appleMusicUrl}
+                              href={t.appleMusicUrl}
                               target="_blank"
                               rel="noreferrer"
+                              onClick={() => track("click_track_apple", { track_title: t.title })}
                               className="text-[8px] text-zinc-500 hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
                             >
                               apple
                             </a>
                           )}
-                          {track.youtubeUrl && (
+                          {t.youtubeUrl && (
                             <a
-                              href={track.youtubeUrl}
+                              href={t.youtubeUrl}
                               target="_blank"
                               rel="noreferrer"
+                              onClick={() => track("click_track_youtube", { track_title: t.title })}
                               className="text-[8px] text-zinc-500 hover:text-[#ff0000] hover:border-[#ff0000] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
                             >
                               youtube
@@ -775,10 +874,10 @@ export default function Home() {
                             <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
                           </div>
                         ) : (
-                          <span className="text-[10px] text-zinc-500 w-[28px] text-right">{track.duration}</span>
+                          <span className="text-[10px] text-zinc-500 w-[28px] text-right">{t.duration}</span>
                         )}
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -826,6 +925,7 @@ export default function Home() {
             <div className="pt-2 flex justify-start">
               <a 
                 href="mailto:thedigitalwrld@gmail.com"
+                onClick={() => track("click_contact_email")}
                 className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#3e1d21] hover:border-[#ff003c] text-white hover:text-white rounded bg-black/40 hover:bg-[#ff003c]/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono"
               >
                 <svg className="w-3.5 h-3.5 text-[#ff003c] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -895,6 +995,7 @@ export default function Home() {
                 href={platform.url}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => track("click_platform_connect", { platform_name: platform.name })}
                 className={`border border-[#1f0f11] bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] ${platform.color}`}
               >
                 <div>
@@ -922,9 +1023,33 @@ export default function Home() {
       <footer className="border-t border-[#1a1112] bg-[#050505] py-12 px-4 md:px-8 text-center text-[9px] text-zinc-600 font-mono">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex gap-6 uppercase tracking-wider font-sans font-bold">
-            <a href="https://instagram.com/05digit" target="_blank" rel="noreferrer" className="hover:text-[#ff003c] transition-colors">Instagram</a>
-            <a href="https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw" target="_blank" rel="noreferrer" className="hover:text-[#ff003c] transition-colors">Spotify</a>
-            <a href="https://www.youtube.com/@05digit" target="_blank" rel="noreferrer" className="hover:text-[#ff003c] transition-colors">YouTube</a>
+            <a 
+              href="https://instagram.com/05digit" 
+              target="_blank" 
+              rel="noreferrer" 
+              onClick={() => track("click_footer_instagram")}
+              className="hover:text-[#ff003c] transition-colors"
+            >
+              Instagram
+            </a>
+            <a 
+              href="https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw" 
+              target="_blank" 
+              rel="noreferrer" 
+              onClick={() => track("click_footer_spotify")}
+              className="hover:text-[#ff003c] transition-colors"
+            >
+              Spotify
+            </a>
+            <a 
+              href="https://www.youtube.com/@05digit" 
+              target="_blank" 
+              rel="noreferrer" 
+              onClick={() => track("click_footer_youtube")}
+              className="hover:text-[#ff003c] transition-colors"
+            >
+              YouTube
+            </a>
           </div>
           <div>
             &copy; {new Date().getFullYear()} Don't Got Time.
