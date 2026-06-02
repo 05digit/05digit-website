@@ -8,6 +8,7 @@ import { Play, Pause, SkipForward, SkipBack, Disc, Headphones, Radio, Volume2, V
 interface Track {
   id: string;
   title: string;
+  feature?: string;
   album: string;
   coverUrl: string;
   audioUrl: string;
@@ -31,7 +32,8 @@ const TRACKS: Track[] = [
   },
   {
     id: "nebeskambink",
-    title: "Nebeskambink (feat. Obsalon)",
+    title: "Nebeskambink",
+    feature: "feat. Obsalon",
     album: "Nebeskambink (2025)",
     coverUrl: "/songs/nebeskambink cover.jpg",
     audioUrl: "/songs/nebeskambink final .wav",
@@ -42,7 +44,8 @@ const TRACKS: Track[] = [
   },
   {
     id: "apakau",
-    title: "apakau (feat. Atikin)",
+    title: "apakau",
+    feature: "feat. Atikin",
     album: "apakau x perfect (2024)",
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
     audioUrl: "/songs/apakau feat atikin.wav",
@@ -112,6 +115,7 @@ const PLATFORMS = [
 interface VideoClip {
   id: string;
   title: string;
+  feature?: string;
   badge: string;
 }
 
@@ -128,12 +132,14 @@ const VIDEO_CLIPS: VideoClip[] = [
   },
   {
     id: "aX0aSpsqEy8",
-    title: "Nebeskambink (feat. Obsalon)",
+    title: "Nebeskambink",
+    feature: "feat. Obsalon",
     badge: "Official Music Video"
   },
   {
     id: "FRqvZ1aif4c",
-    title: "apakau (feat. Atikin)",
+    title: "apakau",
+    feature: "feat. Atikin",
     badge: "Official Visualizer"
   },
   {
@@ -471,11 +477,7 @@ export default function Home() {
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 pointer-events-none" />
 
-              {/* Monospace Badge overlaying video at the top-left */}
-              <div className="absolute top-4 left-4 text-[9px] text-[#ff003c] font-mono tracking-widest uppercase flex items-center gap-1.5 z-20 pointer-events-none bg-black/60 px-2.5 py-1 rounded border border-[#3e1d21]/30">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#ff003c] animate-pulse" />
-                VISUAL CONSOLE
-              </div>
+              {/* Removed Visual Console Badge */}
 
               {/* Left Carousel Navigation */}
               <button
@@ -504,9 +506,14 @@ export default function Home() {
                 <span className="text-[9px] md:text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-1.5 font-sans">
                   {activeVideoClip.badge}
                 </span>
-                <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-snug py-2">
+                <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-snug py-1">
                   {activeVideoClip.title}
                 </h1>
+                {activeVideoClip.feature && (
+                  <div className="text-xs sm:text-sm md:text-base text-zinc-400 font-mono tracking-wider uppercase -mt-1 pb-1">
+                    {activeVideoClip.feature}
+                  </div>
+                )}
               </div>
 
               {/* Carousel Indicators */}
@@ -544,9 +551,7 @@ export default function Home() {
           
           {/* Cover Display Panel (5 Cols) */}
           <div className="lg:col-span-5 border border-[#221012] bg-[#0a0505] p-5 rounded-lg flex flex-col gap-4 relative">
-            <div className="absolute top-2 right-4 text-[9px] text-zinc-600 font-mono tracking-widest">
-              NOW PLAYING
-            </div>
+            {/* Removed Now Playing overlay */}
 
             {/* Release Cover Display */}
             <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_25px_rgba(255,0,60,0.15)]">
@@ -561,6 +566,9 @@ export default function Home() {
               
               <div className="absolute bottom-4 left-4">
                 <h3 className="text-3xl font-normal text-white font-sidewalk tracking-wide mt-1">{activeTrack.title}</h3>
+                {activeTrack.feature && (
+                  <p className="text-[10px] text-zinc-400 font-mono tracking-widest mt-0.5 uppercase">{activeTrack.feature}</p>
+                )}
                 <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">{activeTrack.album}</p>
               </div>
             </div>
@@ -669,6 +677,9 @@ export default function Home() {
                         </span>
                         <div className="min-w-0">
                           <div className={`font-sidewalk text-base tracking-wide ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>{track.title}</div>
+                          {track.feature && (
+                            <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{track.feature}</div>
+                          )}
                           <div className="text-[9px] text-zinc-500 tracking-wider mt-0.5">{track.album}</div>
                         </div>
                       </div>
@@ -772,17 +783,13 @@ export default function Home() {
       {/* --- FOOTER --- */}
       <footer className="border-t border-[#1a1112] bg-[#050505] py-12 px-4 md:px-8 text-center text-[9px] text-zinc-600 font-mono">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2.5">
-            <span className="text-[#ff003c] font-bold">DIGIT SOUND SYSTEM</span>
-            <span className="font-sans"> Lithuania Underground. Transmissions secure.</span>
-          </div>
           <div className="flex gap-6 uppercase tracking-wider font-sans font-bold">
             <a href="https://instagram.com/05digit" target="_blank" rel="noreferrer" className="hover:text-[#ff003c] transition-colors">Instagram</a>
             <a href="https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw" target="_blank" rel="noreferrer" className="hover:text-[#ff003c] transition-colors">Spotify</a>
             <a href="https://www.youtube.com/@05digit" target="_blank" rel="noreferrer" className="hover:text-[#ff003c] transition-colors">YouTube</a>
           </div>
           <div>
-            &copy; {new Date().getFullYear()} digit.
+            &copy; {new Date().getFullYear()} Don't Got Time.
           </div>
         </div>
       </footer>
