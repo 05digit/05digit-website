@@ -88,6 +88,19 @@ const TRACKS: Track[] = [
     youtubeUrl: "https://www.youtube.com/watch?v=TPwBpsgxirc",
     youtubeVideoId: "TPwBpsgxirc",
     videoBadge: "Official Music Video"
+  },
+  {
+    id: "pasuktagalva",
+    title: "Pasukta galva",
+    album: "22:22 (2023)",
+    coverUrl: "/songs/deja vu.jpg",
+    audioUrl: "/songs/deja vu.wav",
+    duration: "2:08",
+    spotifyUrl: "https://open.spotify.com/track/2HT9E1PaeGj6Rnh8GjIeXK?si=2178309151e84c92",
+    appleMusicUrl: "https://music.apple.com/us/album/pasukta-galva/1804513622?i=1804513623",
+    youtubeUrl: "https://www.youtube.com/watch?v=3SBb3v9r-J0",
+    youtubeVideoId: "3SBb3v9r-J0",
+    videoBadge: "Official Audio"
   }
 ];
 
@@ -233,6 +246,9 @@ export default function Home() {
   }, []);
 
   const activeTrack = TRACKS[currentTrackIndex];
+  const displayTrack = isTrailerActive 
+    ? (TRACKS.find(t => t.id === "pasuktagalva") || activeTrack)
+    : activeTrack;
 
   // Helper to skip track automatically on end
   const autoSkipNext = () => {
@@ -512,8 +528,8 @@ export default function Home() {
               {/* Cover Display */}
               <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
                 <Image
-                  src={activeTrack.coverUrl}
-                  alt={activeTrack.title}
+                  src={displayTrack.coverUrl}
+                  alt={displayTrack.title}
                   fill
                   priority
                   className={`object-cover transition-transform duration-700 filter saturate-60 group-hover:saturate-100 ${isPlaying ? "scale-105" : "scale-100"}`}
@@ -521,22 +537,22 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
                 
                 <div className="absolute bottom-3 left-3">
-                  <h3 className="text-xl font-normal text-white font-sidewalk tracking-wide">{activeTrack.title}</h3>
-                  {activeTrack.feature && (
-                    <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-0.5 uppercase">{activeTrack.feature}</p>
+                  <h3 className="text-xl font-normal text-white font-sidewalk tracking-wide">{displayTrack.title}</h3>
+                  {displayTrack.feature && (
+                    <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-0.5 uppercase">{displayTrack.feature}</p>
                   )}
-                  <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">{activeTrack.album}</p>
+                  <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">{displayTrack.album}</p>
                 </div>
               </div>
 
               {/* Song Links in Bigger Colors */}
               <div className="grid grid-cols-3 gap-2">
-                {activeTrack.spotifyUrl ? (
+                {displayTrack.spotifyUrl ? (
                   <a
-                    href={activeTrack.spotifyUrl}
+                    href={displayTrack.spotifyUrl}
                     target="_blank"
                     rel="noreferrer"
-                    onClick={() => track("click_track_spotify", { track_title: activeTrack.title })}
+                    onClick={() => track("click_track_spotify", { track_title: displayTrack.title })}
                     className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
                   >
                     <span>SPOTIFY</span>
@@ -547,12 +563,12 @@ export default function Home() {
                   </div>
                 )}
 
-                {activeTrack.appleMusicUrl ? (
+                {displayTrack.appleMusicUrl ? (
                   <a
-                    href={activeTrack.appleMusicUrl}
+                    href={displayTrack.appleMusicUrl}
                     target="_blank"
                     rel="noreferrer"
-                    onClick={() => track("click_track_apple", { track_title: activeTrack.title })}
+                    onClick={() => track("click_track_apple", { track_title: displayTrack.title })}
                     className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
                   >
                     <span>APPLE</span>
@@ -563,12 +579,12 @@ export default function Home() {
                   </div>
                 )}
 
-                {activeTrack.youtubeUrl ? (
+                {displayTrack.youtubeUrl ? (
                   <a
-                    href={activeTrack.youtubeUrl}
+                    href={displayTrack.youtubeUrl}
                     target="_blank"
                     rel="noreferrer"
-                    onClick={() => track("click_track_youtube", { track_title: activeTrack.title })}
+                    onClick={() => track("click_track_youtube", { track_title: displayTrack.title })}
                     className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
                   >
                     <span>YOUTUBE</span>
