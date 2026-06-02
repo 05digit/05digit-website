@@ -817,31 +817,44 @@ export default function Home() {
                 <div className="text-xs text-white mt-0.5 font-bold">2020</div>
               </div>
               <div>
-                <div className="text-[10px] text-zinc-500 uppercase">sonic scope</div>
-                <div className="text-xs text-[#ff003c] mt-0.5 font-bold">Limitless</div>
+                <div className="text-[10px] text-zinc-500 uppercase">genre</div>
+                <div className="text-xs text-[#ff003c] mt-0.5 font-bold uppercase truncate">hip-hop / undefined</div>
               </div>
+            </div>
+
+            {/* Work With Me / Contact Button */}
+            <div className="pt-2 flex justify-start">
+              <a 
+                href="mailto:thedigitalwrld@gmail.com"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#3e1d21] hover:border-[#ff003c] text-white hover:text-white rounded bg-black/40 hover:bg-[#ff003c]/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono"
+              >
+                <svg className="w-3.5 h-3.5 text-[#ff003c] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path>
+                </svg>
+                work with digit // contact
+              </a>
             </div>
           </div>
 
           {/* Bio Photo Collage (5 Columns) */}
           <div className="lg:col-span-5 grid grid-cols-2 gap-3 relative h-[380px] sm:h-[450px]">
-            {/* Photo 1 (Left Column - Spans full height) */}
+            {/* Photo 1 (Left Column - Spans full height - Portrait format fits profile.JPG perfectly) */}
             <div className="relative rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700 h-full">
               <Image
-                src="/photos/red.JPG"
-                alt="Digit portrait red"
+                src="/photos/profile.JPG"
+                alt="Digit portrait profile"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 50vw, 25vw"
               />
             </div>
 
-            {/* Right Column Stack (Two shorter photos) */}
+            {/* Right Column Stack (Two shorter landscape slots fit red.JPG and hero2.jpg perfectly) */}
             <div className="flex flex-col gap-3 h-full">
               <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
                 <Image
-                  src="/photos/profile.JPG"
-                  alt="Digit profile"
+                  src="/photos/red.JPG"
+                  alt="Digit red portrait landscape"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 25vw, 15vw"
@@ -850,7 +863,7 @@ export default function Home() {
               <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
                 <Image
                   src="/photos/hero2.jpg"
-                  alt="Digit live performance"
+                  alt="Digit live performance landscape"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 25vw, 15vw"
