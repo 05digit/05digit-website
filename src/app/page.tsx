@@ -787,6 +787,79 @@ export default function Home() {
           </div>
         </section>
 
+        {/* --- BIO SECTION --- */}
+        <section className="mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-[#1a1112] pt-12">
+          {/* Bio Text (7 Columns) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="flex items-center gap-2">
+              <span className="text-[#ff003c] font-bold font-mono text-xs">// TRANSMISSION_BIO</span>
+              <span className="h-[1px] w-12 bg-[#2a1316]" />
+            </div>
+            <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
+              about digit
+            </h2>
+            <div className="space-y-4 text-sm text-zinc-400 font-sans leading-relaxed tracking-wide">
+              <p>
+                Digit is a self-made artist from Lithuania, known in the underground scene for blurring the lines between hyperpop, punk, trap, drum &amp; bass, jersey club, and whatever else he feels like. <span className="text-white font-bold font-mono">Unpredictability is the point.</span>
+              </p>
+              <p>
+                Growing up in Lithuania, Digit came from a family of creatives — orchestral musicians, theater and film actors — which shaped an open-minded approach to sound from an early age. Since picking up production in 2020, his music has been in constant sonic evolution, never settling long enough for anyone to pin him down.
+              </p>
+            </div>
+            {/* Quick Stats Panel */}
+            <div className="grid grid-cols-3 gap-4 border border-[#221012] bg-[#0a0505] p-4 rounded text-center font-mono">
+              <div>
+                <div className="text-[10px] text-zinc-500 uppercase">origin</div>
+                <div className="text-xs text-white uppercase mt-0.5 font-bold">Lithuania</div>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 uppercase">active since</div>
+                <div className="text-xs text-white mt-0.5 font-bold">2020</div>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 uppercase">sonic scope</div>
+                <div className="text-xs text-[#ff003c] mt-0.5 font-bold">Limitless</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bio Photo Collage (5 Columns) */}
+          <div className="lg:col-span-5 grid grid-cols-2 gap-3 relative h-[380px] sm:h-[450px]">
+            {/* Photo 1 (Left Column - Spans full height) */}
+            <div className="relative rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700 h-full">
+              <Image
+                src="/photos/red.JPG"
+                alt="Digit portrait red"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 50vw, 25vw"
+              />
+            </div>
+
+            {/* Right Column Stack (Two shorter photos) */}
+            <div className="flex flex-col gap-3 h-full">
+              <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
+                <Image
+                  src="/photos/profile.JPG"
+                  alt="Digit profile"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 25vw, 15vw"
+                />
+              </div>
+              <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
+                <Image
+                  src="/photos/hero2.jpg"
+                  alt="Digit live performance"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 25vw, 15vw"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* --- STREAMS AND SOCIAL PLATFORMS DIAL DIRECT (Forwarding priority) --- */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-8 border-b border-[#221012] pb-4">
