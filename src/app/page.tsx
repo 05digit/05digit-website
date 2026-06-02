@@ -65,6 +65,17 @@ const TRACKS: Track[] = [
     spotifyUrl: "https://open.spotify.com/track/5P1zA17VR4tA3i98aOuBRK?si=dab4151a0b794fd9",
     appleMusicUrl: "https://music.apple.com/us/album/perfect/1804514772?i=1804514778",
     youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4"
+  },
+  {
+    id: "dejavu",
+    title: "deja vu",
+    album: "22:22 (2023)",
+    coverUrl: "/songs/deja vu.jpg",
+    audioUrl: "/songs/deja vu.wav",
+    duration: "2:09",
+    spotifyUrl: "https://open.spotify.com/track/6RMZ738QXWNQ2Jh4QjFk2h",
+    appleMusicUrl: "https://music.apple.com/us/album/deja-vu/1690560084?i=1690560087",
+    youtubeUrl: "https://www.youtube.com/watch?v=NpytYEC3Jg4"
   }
 ];
 
@@ -147,6 +158,11 @@ const VIDEO_CLIPS: VideoClip[] = [
     id: "fAP2UOOGTn4",
     title: "perfect",
     badge: "Official Visualizer"
+  },
+  {
+    id: "NpytYEC3Jg4",
+    title: "deja vu",
+    badge: "Official Music Video"
   }
 ];
 
@@ -503,8 +519,8 @@ export default function Home() {
         </div>
 
         {/* Centered Logo */}
-        <div className="flex justify-center sm:w-2/4">
-          <span className="text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] transition-all duration-300">
+        <div className="flex justify-center items-center sm:w-2/4">
+          <span className="text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] transition-colors duration-300 cursor-pointer translate-y-[3px] md:translate-y-[4px]">
             digit
           </span>
         </div>
@@ -516,7 +532,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_spotify")}
-            className="hover:text-[#1db954] hover:border-[#1db954] transition-all pb-0.5 border-b border-transparent"
+            className="hover:text-[#1db954] hover:border-[#1db954] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
           >
             SPOTIFY
           </a>
@@ -525,7 +541,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_apple")}
-            className="hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all pb-0.5 border-b border-transparent"
+            className="hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
           >
             APPLE
           </a>
@@ -534,7 +550,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_youtube")}
-            className="hover:text-[#ff0000] hover:border-[#ff0000] transition-all pb-0.5 border-b border-transparent"
+            className="hover:text-[#ff0000] hover:border-[#ff0000] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
           >
             YOUTUBE
           </a>
@@ -543,7 +559,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_instagram")}
-            className="hover:text-[#e1306c] hover:border-[#e1306c] transition-all pb-0.5 border-b border-transparent"
+            className="hover:text-[#e1306c] hover:border-[#e1306c] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
           >
             INSTAGRAM
           </a>
