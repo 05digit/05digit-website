@@ -66,7 +66,7 @@ const TRACKS: Track[] = [
   {
     id: "perfect",
     title: "perfect",
-    album: "perfect v4 (2024)",
+    album: "apakau x perfect (2024)",
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
     audioUrl: "/songs/perfect v4_Master.wav",
     duration: "3:05",
@@ -185,26 +185,18 @@ export default function Home() {
   const [duration, setDuration] = useState<number>(0);
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
   const [isTrailerActive, setIsTrailerActive] = useState<boolean>(false);
-  const [visualizerMode, setVisualizerMode] = useState<"bars" | "wave">("bars");
   const [volume, setVolume] = useState<number>(0.8);
 
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
   const ytPlayerRef = useRef<any>(null);
 
   const isPlayingRef = useRef<boolean>(false);
-  const visualizerModeRef = useRef<"bars" | "wave">("bars");
   const volumeRef = useRef<number>(0.8);
   const currentTrackIndexRef = useRef<number>(0);
 
-  // Sync refs with React state to prevent stale closure bugs in visualizer / player events
+  // Sync refs with React state to prevent stale closure bugs in player events
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
-
-  useEffect(() => {
-    visualizerModeRef.current = visualizerMode;
-  }, [visualizerMode]);
 
   useEffect(() => {
     volumeRef.current = volume;
@@ -416,125 +408,7 @@ export default function Home() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Canvas visualizer loop (Red spotlight theme - procedural audio simulation)
-  const startVisualizer = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const bufferLength = 32;
-    const dataArray = new Uint8Array(bufferLength);
-
-    const render = () => {
-      animationFrameRef.current = requestAnimationFrame(render);
-
-      const width = canvas.width;
-      const height = canvas.height;
-      ctx.fillStyle = "#050505";
-      ctx.fillRect(0, 0, width, height);
-
-      // Draw subtle grid line effects
-      ctx.strokeStyle = "#1a0808";
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < width; i += 25) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, height);
-        ctx.stroke();
-      }
-
-      // Procedural visualizer data simulation
-      if (isPlayingRef.current) {
-        const time = Date.now() * 0.008;
-        const vol = volumeRef.current;
-        if (visualizerModeRef.current === "bars") {
-          for (let i = 0; i < bufferLength; i++) {
-            const noise = Math.sin(i * 0.35 + time * 1.6) * Math.cos(i * 0.07 - time * 0.8);
-            const peak = Math.sin(time * (0.9 + (i % 4) * 0.12)) > 0.6 ? 1.7 : 0.75;
-            const amp = Math.max(8, (55 + noise * 40) * peak * vol);
-            dataArray[i] = Math.min(255, amp + Math.random() * 6);
-          }
-        } else {
-          for (let i = 0; i < bufferLength; i++) {
-            const wave = Math.sin(i * 0.22 - time * 2.2) * Math.cos(i * 0.07 + time * 1.3);
-            const peak = Math.sin(time * 1.4) > 0.45 ? 1.4 : 0.8;
-            dataArray[i] = 128 + (wave * 42) * peak * vol + (Math.random() - 0.5) * 3;
-          }
-        }
-      } else {
-        // Idle pulsing
-        const time = Date.now() * 0.004;
-        if (visualizerModeRef.current === "bars") {
-          for (let i = 0; i < bufferLength; i++) {
-            dataArray[i] = Math.max(0, Math.sin(i * 0.15 + time) * 14 + 10 + Math.random() * 2);
-          }
-        } else {
-          for (let i = 0; i < bufferLength; i++) {
-            dataArray[i] = 128 + Math.sin(i * 0.2 + time) * 8 + Math.random() * 1;
-          }
-        }
-      }
-
-      if (visualizerModeRef.current === "bars") {
-        const barWidth = (width / bufferLength) * 1.5;
-        let barHeight;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-          barHeight = (dataArray[i] / 255) * height * 0.85;
-
-          const gradient = ctx.createLinearGradient(0, height, 0, height - barHeight);
-          gradient.addColorStop(0, "#2c0006");
-          gradient.addColorStop(0.5, "#8a0014");
-          gradient.addColorStop(1, "#ff0022");
-
-          ctx.fillStyle = gradient;
-          ctx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
-          
-          if (barHeight > 3) {
-            ctx.fillStyle = "#ff0022";
-            ctx.shadowBlur = 6;
-            ctx.shadowColor = "#ff0022";
-            ctx.fillRect(x, height - barHeight - 1.5, barWidth - 2, 1.5);
-            ctx.shadowBlur = 0;
-          }
-
-          x += barWidth;
-        }
-      } else {
-        // Oscilloscope Mode
-        ctx.beginPath();
-        ctx.lineWidth = 1.5;
-        ctx.strokeStyle = "#ff0022";
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = "#ff0022";
-
-        const sliceWidth = width / bufferLength;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-          const v = dataArray[i] / 128.0;
-          const y = (v * height) / 2;
-
-          if (i === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
-
-          x += sliceWidth;
-        }
-
-        ctx.lineTo(width, height / 2);
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-    };
-
-    render();
-  };
-
+  // Mount / Unmount scripts and setup
   useEffect(() => {
     // 1. Define callback globally
     (window as any).onYouTubeIframeAPIReady = () => {
@@ -547,11 +421,7 @@ export default function Home() {
     const firstScriptTag = document.getElementsByTagName("script")[0];
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 
-    // 3. Start visualizer
-    startVisualizer();
-
     return () => {
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
       if (ytPlayerRef.current) {
         try {
           ytPlayerRef.current.destroy();
@@ -579,7 +449,7 @@ export default function Home() {
 
         {/* Centered Logo */}
         <div className="flex justify-center items-center sm:w-2/4">
-          <span className="text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] transition-colors duration-300 cursor-pointer translate-y-[3px] md:translate-y-[4px]">
+          <span className="text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] hover:[text-shadow:0_0_1px_#ff003c] transition-[color,text-shadow] duration-300 cursor-pointer translate-y-[3px] md:translate-y-[4px]">
             digit
           </span>
         </div>
@@ -627,109 +497,11 @@ export default function Home() {
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
         
-        {/* --- MULTIMEDIA TRANSMISSION HUB // CONSOLE --- */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16 items-start">
+        {/* --- MUSIC & VIDEO SYSTEM --- */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16 items-stretch">
           
-          {/* COLUMN 1: LEFT PANEL (lg:col-span-3) - Cover art, Visualizer & Big Streaming Buttons */}
-          <div className="lg:col-span-3 border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 relative">
-            
-            {/* Cover Display */}
-            <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
-              <Image
-                src={activeTrack.coverUrl}
-                alt={activeTrack.title}
-                fill
-                priority
-                className={`object-cover transition-transform duration-700 filter saturate-60 group-hover:saturate-100 ${isPlaying ? "scale-105" : "scale-100"}`}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
-              
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-xl font-normal text-white font-sidewalk tracking-wide">{activeTrack.title}</h3>
-                {activeTrack.feature && (
-                  <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-0.5 uppercase">{activeTrack.feature}</p>
-                )}
-                <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">{activeTrack.album}</p>
-              </div>
-            </div>
-
-            {/* Real Audio visualizer canvas */}
-            <div className="border border-[#2a1316] rounded bg-[#050505] p-2 relative group">
-              <canvas 
-                ref={canvasRef} 
-                width={500} 
-                height={55} 
-                className="w-full h-[55px] block opacity-95"
-              />
-              <div className="absolute top-1.5 left-2.5 text-[7px] text-zinc-600 uppercase tracking-widest font-mono">
-                visualizer // {visualizerMode}
-              </div>
-              <button 
-                onClick={() => setVisualizerMode(visualizerMode === "bars" ? "wave" : "bars")}
-                className="absolute top-1.5 right-2.5 text-[7px] text-zinc-500 hover:text-[#ff003c] border border-zinc-800 hover:border-[#ff003c] bg-black/60 px-1.5 py-0.5 rounded transition-all uppercase tracking-wider cursor-pointer font-mono"
-              >
-                mode
-              </button>
-            </div>
-
-            {/* Song Links in Bigger Colors */}
-            <div className="space-y-1.5">
-              <span className="text-[8px] text-zinc-500 uppercase tracking-widest block font-mono">// STREAM THIS TRACK</span>
-              <div className="grid grid-cols-3 gap-2">
-                {activeTrack.spotifyUrl ? (
-                  <a
-                    href={activeTrack.spotifyUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => track("click_track_spotify", { track_title: activeTrack.title })}
-                    className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
-                  >
-                    <span>SPOTIFY</span>
-                  </a>
-                ) : (
-                  <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
-                    N/A
-                  </div>
-                )}
-
-                {activeTrack.appleMusicUrl ? (
-                  <a
-                    href={activeTrack.appleMusicUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => track("click_track_apple", { track_title: activeTrack.title })}
-                    className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
-                  >
-                    <span>APPLE</span>
-                  </a>
-                ) : (
-                  <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
-                    N/A
-                  </div>
-                )}
-
-                {activeTrack.youtubeUrl ? (
-                  <a
-                    href={activeTrack.youtubeUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => track("click_track_youtube", { track_title: activeTrack.title })}
-                    className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
-                  >
-                    <span>YOUTUBE</span>
-                  </a>
-                ) : (
-                  <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
-                    N/A
-                  </div>
-                )}
-              </div>
-            </div>
-
-          </div>
-
-          {/* COLUMN 2: MIDDLE PANEL (lg:col-span-6) - YouTube Video Player & Bottom Controls */}
-          <div className="lg:col-span-6 flex flex-col gap-4">
+          {/* COLUMN 1: VIDEO & PLAYBACK SYSTEM (lg:col-span-8) */}
+          <div className="lg:col-span-8 flex flex-col gap-4">
             
             {/* Unified Video Box */}
             <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
@@ -772,12 +544,12 @@ export default function Home() {
             </div>
 
             {/* Player controls */}
-            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-3">
+            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-3 justify-between flex-1">
               
-              {/* Current Track Readout (Title removed from video and integrated here) */}
+              {/* Current Track Readout */}
               <div className="flex flex-col gap-0.5 border-b border-[#1b0d0e] pb-2">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[8px] text-[#ff003c] font-mono tracking-widest uppercase">// NOW TRANSMITTING</span>
+                  <span className="text-[8px] text-[#ff003c] font-mono tracking-widest uppercase">// NOW PLAYING</span>
                   <span className="h-[1px] w-4 bg-[#2a1316]" />
                   <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL TRAILER" : activeTrack.videoBadge}</span>
                 </div>
@@ -869,56 +641,132 @@ export default function Home() {
 
           </div>
 
-          {/* COLUMN 3: RIGHT PANEL (lg:col-span-3) - Interactive Tracklist */}
-          <div className="lg:col-span-3 border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col h-full self-stretch">
-            <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">// TRACKLIST TRANSMISSION</span>
-            <div className="space-y-1.5 flex-1 overflow-y-auto max-h-[350px] lg:max-h-none pr-1">
-              {TRACKS.map((t, index) => {
-                const isActive = currentTrackIndex === index && !isTrailerActive;
-                return (
-                  <div
-                    key={t.id}
-                    onClick={() => selectTrack(index)}
-                    className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border ${
-                      isActive 
-                        ? "bg-[#ff003c]/10 border-[#ff003c]/30 text-white" 
-                        : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between min-w-0">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[8px] font-mono ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span className={`font-sidewalk text-sm tracking-wide truncate ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>
-                          {t.title}
-                        </span>
+          {/* COLUMN 2: COVER, TRACKLIST & STREAM LINKS (lg:col-span-4) */}
+          <div className="lg:col-span-4 border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 self-stretch">
+            
+            {/* Cover Display */}
+            <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
+              <Image
+                src={activeTrack.coverUrl}
+                alt={activeTrack.title}
+                fill
+                priority
+                className={`object-cover transition-transform duration-700 filter saturate-60 group-hover:saturate-100 ${isPlaying ? "scale-105" : "scale-100"}`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
+              
+              <div className="absolute bottom-3 left-3">
+                <h3 className="text-xl font-normal text-white font-sidewalk tracking-wide">{activeTrack.title}</h3>
+                {activeTrack.feature && (
+                  <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-0.5 uppercase">{activeTrack.feature}</p>
+                )}
+                <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">{activeTrack.album}</p>
+              </div>
+            </div>
+
+            {/* Song Links in Bigger Colors */}
+            <div className="grid grid-cols-3 gap-2">
+              {activeTrack.spotifyUrl ? (
+                <a
+                  href={activeTrack.spotifyUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => track("click_track_spotify", { track_title: activeTrack.title })}
+                  className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                >
+                  <span>SPOTIFY</span>
+                </a>
+              ) : (
+                <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                  N/A
+                </div>
+              )}
+
+              {activeTrack.appleMusicUrl ? (
+                <a
+                  href={activeTrack.appleMusicUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => track("click_track_apple", { track_title: activeTrack.title })}
+                  className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                >
+                  <span>APPLE</span>
+                </a>
+              ) : (
+                <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                  N/A
+                </div>
+              )}
+
+              {activeTrack.youtubeUrl ? (
+                <a
+                  href={activeTrack.youtubeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => track("click_track_youtube", { track_title: activeTrack.title })}
+                  className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                >
+                  <span>YOUTUBE</span>
+                </a>
+              ) : (
+                <div className="flex items-center justify-center py-2 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                  N/A
+                </div>
+              )}
+            </div>
+
+            {/* Interactive Tracklist Selector */}
+            <div className="flex flex-col flex-1 min-h-0 border-t border-[#1b0d0e] pt-4">
+              <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">// TRACKLIST</span>
+              <div className="space-y-1.5 flex-1 overflow-y-auto max-h-[350px] lg:max-h-[360px] pr-1">
+                {TRACKS.map((t, index) => {
+                  const isActive = currentTrackIndex === index && !isTrailerActive;
+                  return (
+                    <div
+                      key={t.id}
+                      onClick={() => selectTrack(index)}
+                      className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border ${
+                        isActive 
+                          ? "bg-[#ff003c]/10 border-[#ff003c]/30 text-white" 
+                          : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`text-[8px] font-mono ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <span className={`font-sidewalk text-sm tracking-wide truncate ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>
+                            {t.title}
+                          </span>
+                        </div>
+                        
+                        {isActive && isPlaying ? (
+                          <div className="flex items-end gap-0.5 h-2 w-3.5 justify-end shrink-0">
+                            <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
+                            <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
+                            <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
+                          </div>
+                        ) : (
+                          <span className="text-[8px] text-zinc-500 font-mono shrink-0">{t.duration}</span>
+                        )}
                       </div>
                       
-                      {isActive && isPlaying ? (
-                        <div className="flex items-end gap-0.5 h-2 w-3.5 justify-end shrink-0">
-                          <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
-                          <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
-                          <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
+                      {t.feature && (
+                        <div className="text-[8px] text-zinc-500 font-mono pl-4 mt-0.5 lowercase">
+                          {t.feature}
                         </div>
-                      ) : (
-                        <span className="text-[8px] text-zinc-500 font-mono shrink-0">{t.duration}</span>
                       )}
-                    </div>
-                    
-                    {t.feature && (
-                      <div className="text-[8px] text-zinc-500 font-mono pl-4 mt-0.5 lowercase">
-                        {t.feature}
+                      
+                      <div className="text-[8px] text-zinc-600 font-sans tracking-wide pl-4 mt-0.5">
+                        {t.album.includes("(") ? t.album.split("(")[0].trim() : t.album}
                       </div>
-                    )}
-                    
-                    <div className="text-[8px] text-zinc-600 font-sans tracking-wide pl-4 mt-0.5">
-                      {t.album.includes("(") ? t.album.split("(")[0].trim() : t.album}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+
           </div>
 
         </section>
@@ -928,7 +776,7 @@ export default function Home() {
           {/* Bio Text (7 Columns) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-2">
-              <span className="text-[#ff003c] font-bold font-mono text-xs">// TRANSMISSION_BIO</span>
+              <span className="text-[#ff003c] font-bold font-mono text-xs">// BIO</span>
               <span className="h-[1px] w-12 bg-[#2a1316]" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
@@ -1013,7 +861,7 @@ export default function Home() {
         {/* --- CONNECT / FOOTER PLATFORMS --- */}
         <section className="mb-16 border-t border-[#1a1112] pt-12">
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-[#ff003c] font-bold font-mono text-xs">// PLATFORM_CONNECT_MATRIX</span>
+            <span className="text-[#ff003c] font-bold font-mono text-xs">// CONNECT</span>
             <span className="h-[1px] w-12 bg-[#2a1316]" />
           </div>
           
