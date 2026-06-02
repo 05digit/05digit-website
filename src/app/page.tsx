@@ -457,14 +457,6 @@ export default function Home() {
         {/* --- HERO VIDEO BLOCK --- */}
         <section className="mb-12">
           <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
-            {/* Accents */}
-            <div className="absolute top-3 left-4 text-[9px] text-zinc-500 font-mono tracking-widest z-20 pointer-events-none">
-              [ TRANS_ONLINE ]
-            </div>
-            <div className="absolute top-3 right-4 text-[9px] text-[#ff003c] font-mono tracking-widest uppercase flex items-center gap-1.5 z-20 pointer-events-none">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#ff003c] animate-pulse" />
-              VISUAL CONSOLE
-            </div>
 
             {/* Video Box */}
             <div className="relative aspect-video w-full rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
@@ -478,6 +470,12 @@ export default function Home() {
               
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 pointer-events-none" />
+
+              {/* Monospace Badge overlaying video at the top-left */}
+              <div className="absolute top-4 left-4 text-[9px] text-[#ff003c] font-mono tracking-widest uppercase flex items-center gap-1.5 z-20 pointer-events-none bg-black/60 px-2.5 py-1 rounded border border-[#3e1d21]/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#ff003c] animate-pulse" />
+                VISUAL CONSOLE
+              </div>
 
               {/* Left Carousel Navigation */}
               <button
@@ -501,12 +499,12 @@ export default function Home() {
                 </svg>
               </button>
 
-              {/* Title Overlay in Pretty Sidewalk Font */}
-              <div className="absolute bottom-6 left-6 md:left-8 pointer-events-none select-none z-10 max-w-[55%]">
-                <span className="text-[9px] md:text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-1 font-sans">
+              {/* Title Overlay in Pretty Sidewalk Font - Bounding padding added to prevent top cutoff */}
+              <div className="absolute bottom-6 left-6 md:left-8 pointer-events-none select-none z-10 max-w-[80%] md:max-w-none">
+                <span className="text-[9px] md:text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-1.5 font-sans">
                   {activeVideoClip.badge}
                 </span>
-                <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-none truncate">
+                <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-snug py-2">
                   {activeVideoClip.title}
                 </h1>
               </div>
@@ -590,7 +588,7 @@ export default function Home() {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-sans">AUDIO FORMAT // WAV</span>
-                  <h2 className="text-xl font-normal text-[#ff003c] font-sidewalk tracking-widest mt-1">track controls</h2>
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-[#ff003c] mt-1 font-sans">track controls</h2>
                 </div>
                 
                 <div className="flex items-center gap-1.5 bg-[#ff003c]/10 border border-[#ff003c]/30 px-2.5 py-1 rounded text-[9px] text-[#ff003c] font-bold">
@@ -599,15 +597,11 @@ export default function Home() {
                 </div>
               </div>
 
-              <p className="text-xs text-zinc-400 mb-6 uppercase tracking-wide leading-relaxed min-h-[36px]">
-                {activeTrack.description}
-              </p>
-
               {/* Progress Slider (Real Time) */}
               <div className="space-y-1.5 mb-6">
                 <div className="flex justify-between text-[9px] text-zinc-500 font-mono">
                   <span>{formatTime(currentTime)}</span>
-                  <span className="text-[#ff003c]">{activeTrack.tempo}</span>
+                  <span className="text-[#ff003c] font-sans tracking-widest uppercase text-[8px] opacity-75">stereo</span>
                   <span>{formatTime(duration)}</span>
                 </div>
                 <input
@@ -648,7 +642,7 @@ export default function Home() {
               <div className="border border-dashed border-[#341b1e] p-3 rounded bg-black/60 flex items-start gap-2.5">
                 <Headphones size={15} className="text-[#ff003c] shrink-0 mt-0.5" />
                 <span className="text-[9px] text-zinc-500 uppercase leading-relaxed font-sans">
-                  <strong className="text-zinc-300">HI-RES AUDIO:</strong> Playing CD-quality WAV files. Use the controls above to navigate the track.
+                  <strong className="text-zinc-300">RAW WAV FORMAT:</strong> these are the original uncompressed WAV files directly from the studio. raw transmission.
                 </span>
               </div>
             </div>
@@ -679,7 +673,17 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-[9px] text-zinc-600">{track.tempo}</span>
+                        {track.youtubeUrl && (
+                          <a
+                            href={track.youtubeUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[9px] text-zinc-500 hover:text-[#ff003c] transition-all uppercase tracking-wider border border-zinc-800 hover:border-[#ff003c] px-2 py-0.5 rounded bg-black/40"
+                          >
+                            watch
+                          </a>
+                        )}
                         {isActive && isPlaying ? (
                           <div className="flex items-end gap-0.5 h-3">
                             <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
