@@ -27,7 +27,7 @@ const TRACKS: Track[] = [
     duration: "2:50",
     tempo: "140 BPM",
     description: "Lithuanian underground supertrap anthem. Blurring the lines between heavy digital slides and distorted sub frequencies.",
-    youtubeUrl: "https://www.youtube.com/@05digit"
+    youtubeUrl: "https://www.youtube.com/watch?v=F4NdmdLr7_w"
   },
   {
     id: "nebeskambink",
@@ -38,7 +38,7 @@ const TRACKS: Track[] = [
     duration: "2:40",
     tempo: "130 BPM",
     description: "Dark atmosphere pad textures mixed with rapid-fire hi-hat rolls. Collaboration with Obsalon.",
-    youtubeUrl: "https://www.youtube.com/@05digit"
+    youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8"
   },
   {
     id: "apakau",
@@ -49,7 +49,7 @@ const TRACKS: Track[] = [
     duration: "2:15",
     tempo: "150 BPM",
     description: "Feat. Atikin. Hyper-speed hat rolls, distorted slides and high-pitch synth bells.",
-    youtubeUrl: "https://www.youtube.com/@05digit"
+    youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c"
   },
   {
     id: "perfect",
@@ -60,7 +60,7 @@ const TRACKS: Track[] = [
     duration: "3:05",
     tempo: "145 BPM",
     description: "Industrial darkwave bass fused with glitchy snare structures and atmospheric pads.",
-    youtubeUrl: "https://www.youtube.com/@05digit"
+    youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4"
   }
 ];
 
@@ -109,13 +109,43 @@ const PLATFORMS = [
   }
 ];
 
+interface VideoClip {
+  id: string;
+  title: string;
+  badge: string;
+}
+
+const VIDEO_CLIPS: VideoClip[] = [
+  {
+    id: "F4NdmdLr7_w",
+    title: "Primityva",
+    badge: "OFFICIAL VISUALIZER"
+  },
+  {
+    id: "aX0aSpsqEy8",
+    title: "Nebeskambink",
+    badge: "OFFICIAL MUSIC VIDEO"
+  },
+  {
+    id: "FRqvZ1aif4c",
+    title: "apakau",
+    badge: "OFFICIAL VISUALIZER"
+  },
+  {
+    id: "fAP2UOOGTn4",
+    title: "perfect",
+    badge: "OFFICIAL VISUALIZER"
+  }
+];
+
 export default function Home() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
-  const [activeVideo, setActiveVideo] = useState<string>("/videos/Primityva Visualizer.mp4");
+  const [activeVideoIndex, setActiveVideoIndex] = useState<number>(0);
+  const activeVideoClip = VIDEO_CLIPS[activeVideoIndex];
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -430,37 +460,32 @@ export default function Home() {
 
             {/* Video Box */}
             <div className="relative aspect-video w-full rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
-              <video
-                ref={videoRef}
-                src={activeVideo}
-                autoPlay
-                loop
-                muted={isVideoMuted}
-                playsInline
-                className="w-full h-full object-cover grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideoClip.id}?autoplay=1&mute=${isVideoMuted ? 1 : 0}&loop=1&playlist=${activeVideoClip.id}&controls=1&rel=0&modestbranding=1`}
+                title={activeVideoClip.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
               />
               
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-85" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 pointer-events-none" />
 
               {/* Title Overlay in Pretty Sidewalk Font */}
-              <div className="absolute bottom-6 left-6 md:left-8">
+              <div className="absolute bottom-6 left-6 md:left-8 pointer-events-none select-none z-10">
                 <span className="text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-2 font-sans">
-                  OFFICIAL VISUALIZER // LIT
+                  {activeVideoClip.badge}
                 </span>
-                <h1 className="text-4xl md:text-7xl font-normal text-white uppercase select-none font-sidewalk tracking-wide leading-none">
-                  digit
+                <h1 className="text-4xl md:text-7xl font-normal text-white uppercase font-sidewalk tracking-wide leading-none">
+                  {activeVideoClip.title}
                 </h1>
               </div>
 
               {/* Video control toggles */}
-              <div className="absolute bottom-6 right-6 flex items-center gap-2">
+              <div className="absolute bottom-6 right-6 flex items-center gap-2 z-10">
                 <button
                   onClick={() => {
-                    const videoSrc = activeVideo === "/videos/Primityva Visualizer.mp4" 
-                      ? "/videos/hero trailer.mp4" 
-                      : "/videos/Primityva Visualizer.mp4";
-                    setActiveVideo(videoSrc);
+                    setActiveVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length);
                   }}
                   className="bg-black/85 hover:bg-[#ff003c]/20 border border-[#3e1d21] hover:border-[#ff003c] text-white text-[9px] font-bold px-3 py-1.5 rounded tracking-widest uppercase transition-all duration-300 active:scale-95"
                 >
