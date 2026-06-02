@@ -279,6 +279,10 @@ export default function Home() {
           // 1 = PLAYING, 2 = PAUSED, 0 = ENDED
           if (playerState === 1) {
             setIsPlaying(true);
+            setIsVideoMuted(false);
+            if (volumeRef.current === 0) {
+              setVolume(0.8);
+            }
           } else if (playerState === 2 || playerState === 0) {
             setIsPlaying(false);
           }
@@ -389,6 +393,10 @@ export default function Home() {
         setIsPlaying(false);
         track("audio_pause", { track_title: activeTrack.title });
       } else {
+        setIsVideoMuted(false);
+        if (volume === 0) {
+          setVolume(0.8);
+        }
         ytPlayerRef.current.playVideo();
         setIsPlaying(true);
         track("audio_play", { track_title: activeTrack.title });
@@ -415,6 +423,11 @@ export default function Home() {
     setCurrentTrackIndex(index);
     track("select_track", { track_title: TRACKS[index].title });
 
+    setIsVideoMuted(false);
+    if (volume === 0) {
+      setVolume(0.8);
+    }
+
     if (ytPlayerRef.current && ytPlayerRef.current.loadVideoById) {
       try {
         ytPlayerRef.current.loadVideoById({
@@ -430,6 +443,11 @@ export default function Home() {
   const handleToggleTrailer = () => {
     track("click_trailer_toggle", { current_state: isTrailerActive });
     if (!ytPlayerRef.current || !ytPlayerRef.current.loadVideoById) return;
+
+    setIsVideoMuted(false);
+    if (volume === 0) {
+      setVolume(0.8);
+    }
 
     try {
       if (!isTrailerActive) {
