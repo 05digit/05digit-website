@@ -16,10 +16,14 @@ export const metadata: Metadata = {
   title: "digit | 05digit",
   description: "Official website for underground artist digit aka 05digit. Stream music, watch official visualizers, and connect.",
   icons: {
-    icon: "/icon.svg?v=05",
-    shortcut: "/icon.svg?v=05",
-    apple: "/icon.svg?v=05",
-  }
+    icon: [
+      { url: "/favicon_io/favicon-32x32.png?v=05", sizes: "32x32", type: "image/png" },
+      { url: "/favicon_io/favicon-16x16.png?v=05", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/favicon_io/favicon.ico?v=05",
+    apple: "/favicon_io/apple-touch-icon.png?v=05",
+  },
+  manifest: "/favicon_io/site.webmanifest?v=05",
 };
 
 export default function RootLayout({
