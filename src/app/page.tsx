@@ -194,14 +194,14 @@ const VIDEO_CLIPS: VideoClip[] = [
 export default function Home() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
   const [isTrailerActive, setIsTrailerActive] = useState<boolean>(true);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.8);
+  const [isDraggingVolume, setIsDraggingVolume] = useState<boolean>(false);
 
   const ytPlayerRef = useRef<any>(null);
+  const volumeBarRef = useRef<HTMLDivElement>(null);
 
   const isPlayingRef = useRef<boolean>(false);
   const volumeRef = useRef<number>(0.8);
@@ -291,21 +291,66 @@ export default function Home() {
     });
   };
 
-  // Poll current video play time and duration
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying) {
-      timer = setInterval(() => {
-        if (ytPlayerRef.current && ytPlayerRef.current.getCurrentTime) {
-          try {
-            setCurrentTime(ytPlayerRef.current.getCurrentTime() || 0);
-            setDuration(ytPlayerRef.current.getDuration() || 0);
-          } catch (e) {}
-        }
-      }, 500);
+  // Custom vertical volume slider handlers
+  const handleVolumeClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (!volumeBarRef.current) return;
+    const rect = volumeBarRef.current.getBoundingClientRect();
+    const clientY = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+    const relativeY = clientY - rect.top;
+    const percentage = 1 - (relativeY / rect.height);
+    const newVolume = Math.max(0, Math.min(1, percentage));
+    setVolume(newVolume);
+    if (newVolume > 0) {
+      setIsVideoMuted(false);
+    } else {
+      setIsVideoMuted(true);
     }
-    return () => clearInterval(timer);
-  }, [isPlaying]);
+  };
+
+  useEffect(() => {
+    if (!isDraggingVolume) return;
+
+    const handleMove = (clientY: number) => {
+      if (!volumeBarRef.current) return;
+      const rect = volumeBarRef.current.getBoundingClientRect();
+      const relativeY = clientY - rect.top;
+      const percentage = 1 - (relativeY / rect.height);
+      const newVolume = Math.max(0, Math.min(1, percentage));
+      setVolume(newVolume);
+      if (newVolume > 0) {
+        setIsVideoMuted(false);
+      } else {
+        setIsVideoMuted(true);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleMove(e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientY);
+      }
+    };
+
+    const handleEnd = () => {
+      setIsDraggingVolume(false);
+      track("change_volume", { volume_level: volumeRef.current });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleEnd);
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleEnd);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleEnd);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleEnd);
+    };
+  }, [isDraggingVolume]);
 
   // Sync volume state with YT player
   useEffect(() => {
@@ -368,7 +413,6 @@ export default function Home() {
   const selectTrack = (index: number) => {
     setIsTrailerActive(false);
     setCurrentTrackIndex(index);
-    setCurrentTime(0);
     track("select_track", { track_title: TRACKS[index].title });
 
     if (ytPlayerRef.current && ytPlayerRef.current.loadVideoById) {
@@ -408,22 +452,7 @@ export default function Home() {
     } catch (e) {}
   };
 
-  const handleScrub = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const scrubTime = parseFloat(e.target.value);
-    setCurrentTime(scrubTime);
-    if (ytPlayerRef.current && ytPlayerRef.current.seekTo) {
-      try {
-        ytPlayerRef.current.seekTo(scrubTime, true);
-      } catch (e) {}
-    }
-  };
 
-  const formatTime = (time: number) => {
-    if (isNaN(time)) return "0:00";
-    const mins = Math.floor(time / 60);
-    const secs = Math.floor(time % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
 
   // Mount / Unmount scripts and setup
   useEffect(() => {
@@ -606,43 +635,59 @@ export default function Home() {
           }`}>
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 h-full justify-between">
               
-              {/* Unified Video Box */}
-              <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
+              {/* Unified Video & Audio Side Controller Box */}
+              <div className="border border-[#281517] bg-[#0c0707] p-2 rounded-lg flex flex-row gap-3 items-stretch relative overflow-hidden group">
                 {/* Target div for YouTube player loading */}
-                <div className="relative aspect-video w-full rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
+                <div className="relative aspect-video flex-1 rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
                   <div id="yt-player" className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
-                  
-                  {/* Visual Video Shade */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-90 pointer-events-none" />
+                </div>
 
-                  {/* Trailer Switcher Overlay (Top Left) */}
-                  <div className="absolute top-3 left-3 z-20">
-                    <button
-                      onClick={handleToggleTrailer}
-                      className={`px-2.5 py-1 rounded text-[7px] font-mono font-bold tracking-widest border transition-all duration-300 active:scale-95 cursor-pointer ${
-                        isTrailerActive
-                          ? "bg-[#ff003c] text-black border-[#ff003c] shadow-[0_0_8px_#ff003c]"
-                          : "bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white"
-                      }`}
-                    >
-                      {isTrailerActive ? "SHOW TRACK VIDEO" : "WATCH TRAILER"}
-                    </button>
+                {/* Vertical Audio Controller on the Side */}
+                <div className="flex flex-col items-center justify-between py-2 px-2 border border-[#2a1316]/50 bg-black/60 rounded gap-3 w-10 shrink-0">
+                  {/* Mute/Unmute Toggle */}
+                  <button
+                    onClick={() => {
+                      const nextMute = !isVideoMuted;
+                      setIsVideoMuted(nextMute);
+                      track("click_video_mute_toggle", { muted: nextMute });
+                    }}
+                    className="bg-black/90 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer shrink-0"
+                    aria-label="Mute Toggle"
+                  >
+                    {isVideoMuted ? <VolumeX size={12} className="text-[#ff003c]" /> : <Volume2 size={12} />}
+                  </button>
+
+                  {/* Vertical Volume Slider (Custom drag handler) */}
+                  <div 
+                    ref={volumeBarRef}
+                    onClick={handleVolumeClick}
+                    onMouseDown={(e) => {
+                      setIsDraggingVolume(true);
+                      handleVolumeClick(e);
+                    }}
+                    onTouchStart={(e) => {
+                      setIsDraggingVolume(true);
+                      handleVolumeClick(e);
+                    }}
+                    className="flex-1 w-full flex items-center justify-center cursor-pointer relative py-2 select-none"
+                  >
+                    {/* Track Background */}
+                    <div className="w-1 h-full bg-[#1a0e10] rounded-full relative flex flex-col justify-end">
+                      {/* Active Fill Track */}
+                      <div 
+                        className="w-full bg-[#ff003c] rounded-full relative" 
+                        style={{ height: `${volume * 100}%` }}
+                      >
+                        {/* Glow Handle/Thumb */}
+                        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#ff003c] border border-white/20 rounded-full shadow-[0_0_8px_#ff003c] hover:scale-125 transition-transform duration-100" />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Mute button overlay (Top Right) */}
-                  <div className="absolute top-3 right-3 z-20">
-                    <button
-                      onClick={() => {
-                        setIsVideoMuted(!isVideoMuted);
-                        track("click_video_mute_toggle", { muted: !isVideoMuted });
-                      }}
-                      className="bg-black/85 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1 rounded-full transition-all duration-300 active:scale-95 cursor-pointer"
-                      aria-label="Mute Toggle"
-                    >
-                      {isVideoMuted ? <VolumeX size={12} className="text-[#ff003c]" /> : <Volume2 size={12} />}
-                    </button>
-                  </div>
-
+                  {/* Volume Label */}
+                  <span className="text-[7px] text-zinc-500 font-mono text-center shrink-0">
+                    {Math.round(volume * 100)}%
+                  </span>
                 </div>
               </div>
 
@@ -671,7 +716,7 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* Playback Controls and Volume Row (Stacks vertically when expanded to prevent overflow) */}
+                {/* Playback Controls and Trailer Switcher Row */}
                 <div className={`flex gap-3 transition-all duration-700 ease-in-out w-full ${
                   isExpanded ? "flex-col" : "flex-col sm:flex-row items-center justify-between"
                 }`}>
@@ -700,34 +745,15 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {/* Right part: Volume slider */}
-                  <div className="flex items-center gap-2 bg-[#0c0707] border border-[#1c0f10] px-2.5 py-1.5 rounded w-full sm:w-auto justify-center sm:justify-start">
+                  {/* Right part: Trailer switcher button (moved off the video frame) */}
+                  {!isTrailerActive && (
                     <button
-                      onClick={() => {
-                        const nextVolume = volume === 0 ? 0.8 : 0;
-                        setVolume(nextVolume);
-                        track("click_volume_toggle", { muted: nextVolume === 0 });
-                      }}
-                      className="text-zinc-500 hover:text-[#ff003c] transition-colors shrink-0 active:scale-95 cursor-pointer"
-                      aria-label="Volume Toggle"
+                      onClick={handleToggleTrailer}
+                      className="px-4 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white transition-all duration-300 active:scale-95 cursor-pointer w-full sm:w-auto"
                     >
-                      {volume === 0 ? <VolumeX size={11} className="text-[#ff003c]" /> : <Volume2 size={11} />}
+                      WATCH TRAILER
                     </button>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={volume}
-                      onChange={(e) => setVolume(parseFloat(e.target.value))}
-                      onMouseUp={() => track("change_volume", { volume_level: volume })}
-                      onTouchEnd={() => track("change_volume", { volume_level: volume })}
-                      className="w-16 h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
-                    />
-                    <span className="text-[8px] text-zinc-500 font-mono w-5 text-right shrink-0">
-                      {Math.round(volume * 100)}%
-                    </span>
-                  </div>
+                  )}
 
                 </div>
 
@@ -739,22 +765,6 @@ export default function Home() {
                   >
                     {isExpanded ? "COLLAPSE" : "MORE MUSIC"}
                   </button>
-                </div>
-
-                {/* Progress Scrub Slider */}
-                <div className="space-y-0.5">
-                  <div className="flex justify-between text-[8px] text-zinc-500 font-mono">
-                    <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(duration)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max={duration || 100}
-                    value={currentTime}
-                    onChange={handleScrub}
-                    className="w-full h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
-                  />
                 </div>
 
               </div>
