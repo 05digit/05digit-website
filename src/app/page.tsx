@@ -27,8 +27,8 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/primityva cover v2 jpeg.jpg",
     audioUrl: "/songs/primityva v2.wav",
     duration: "2:50",
-    spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
-    appleMusicUrl: "https://music.apple.com/us/artist/digit/1524901037",
+    spotifyUrl: "https://open.spotify.com/track/0nfluE2XHeBqu0bX7AcrUh?si=30f34425ced64c95",
+    appleMusicUrl: "https://music.apple.com/lt/album/primityva/6769248612?i=6769248795",
     youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8"
   },
   {
@@ -40,7 +40,7 @@ const TRACKS: Track[] = [
     audioUrl: "/songs/nebeskambink final .wav",
     duration: "2:40",
     spotifyUrl: "https://open.spotify.com/track/2ljYOhOpy6TTgy2UFxZKRN?si=3bf9a6c9cca84fbf",
-    appleMusicUrl: "https://music.apple.com/us/album/nebeskambink-single/1810770309",
+    appleMusicUrl: "https://music.apple.com/us/album/nebeskambink/1810770309?i=1810770311",
     youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8"
   },
   {
@@ -51,8 +51,8 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
     audioUrl: "/songs/apakau feat atikin.wav",
     duration: "2:15",
-    spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
-    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1804514772",
+    spotifyUrl: "https://open.spotify.com/track/1wlbcOYoSttIjHBcZr7NUB?si=15692867df4a4cc3",
+    appleMusicUrl: "https://music.apple.com/us/album/apakau/1804514772?i=1804514773",
     youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c"
   },
   {
@@ -62,8 +62,8 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
     audioUrl: "/songs/perfect v4_Master.wav",
     duration: "3:05",
-    spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
-    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1804514772",
+    spotifyUrl: "https://open.spotify.com/track/5P1zA17VR4tA3i98aOuBRK?si=dab4151a0b794fd9",
+    appleMusicUrl: "https://music.apple.com/us/album/perfect/1804514772?i=1804514778",
     youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4"
   }
 ];
