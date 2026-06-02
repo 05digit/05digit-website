@@ -17,6 +17,8 @@ interface Track {
   spotifyUrl?: string;
   appleMusicUrl?: string;
   youtubeUrl?: string;
+  youtubeVideoId: string;
+  videoBadge: string;
 }
 
 const TRACKS: Track[] = [
@@ -29,7 +31,9 @@ const TRACKS: Track[] = [
     duration: "2:50",
     spotifyUrl: "https://open.spotify.com/track/0nfluE2XHeBqu0bX7AcrUh?si=30f34425ced64c95",
     appleMusicUrl: "https://music.apple.com/lt/album/primityva/6769248612?i=6769248795",
-    youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8"
+    youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8",
+    youtubeVideoId: "nNoiPOPh9j8",
+    videoBadge: "Official Visualizer"
   },
   {
     id: "nebeskambink",
@@ -41,7 +45,9 @@ const TRACKS: Track[] = [
     duration: "2:40",
     spotifyUrl: "https://open.spotify.com/track/2ljYOhOpy6TTgy2UFxZKRN?si=3bf9a6c9cca84fbf",
     appleMusicUrl: "https://music.apple.com/us/album/nebeskambink/1810770309?i=1810770311",
-    youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8"
+    youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8",
+    youtubeVideoId: "aX0aSpsqEy8",
+    videoBadge: "Official Music Video"
   },
   {
     id: "apakau",
@@ -53,7 +59,9 @@ const TRACKS: Track[] = [
     duration: "2:15",
     spotifyUrl: "https://open.spotify.com/track/1wlbcOYoSttIjHBcZr7NUB?si=15692867df4a4cc3",
     appleMusicUrl: "https://music.apple.com/us/album/apakau/1804514772?i=1804514773",
-    youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c"
+    youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c",
+    youtubeVideoId: "FRqvZ1aif4c",
+    videoBadge: "Official Visualizer"
   },
   {
     id: "perfect",
@@ -64,7 +72,9 @@ const TRACKS: Track[] = [
     duration: "3:05",
     spotifyUrl: "https://open.spotify.com/track/5P1zA17VR4tA3i98aOuBRK?si=dab4151a0b794fd9",
     appleMusicUrl: "https://music.apple.com/us/album/perfect/1804514772?i=1804514778",
-    youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4"
+    youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4",
+    youtubeVideoId: "fAP2UOOGTn4",
+    videoBadge: "Official Visualizer"
   },
   {
     id: "dejavu",
@@ -75,7 +85,9 @@ const TRACKS: Track[] = [
     duration: "2:09",
     spotifyUrl: "https://open.spotify.com/track/6RMZ738QXWNQ2Jh4QjFk2h?si=c39efe8e9c5443e9",
     appleMusicUrl: "https://music.apple.com/lt/album/deja-vu/1804513622?i=1804513630",
-    youtubeUrl: "https://www.youtube.com/watch?v=TPwBpsgxirc"
+    youtubeUrl: "https://www.youtube.com/watch?v=TPwBpsgxirc",
+    youtubeVideoId: "TPwBpsgxirc",
+    videoBadge: "Official Music Video"
   }
 ];
 
@@ -172,10 +184,9 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(true);
-  const [activeVideoIndex, setActiveVideoIndex] = useState<number>(0);
+  const [isTrailerActive, setIsTrailerActive] = useState<boolean>(false);
   const [visualizerMode, setVisualizerMode] = useState<"bars" | "wave">("bars");
   const [volume, setVolume] = useState<number>(0.8);
-  const activeVideoClip = VIDEO_CLIPS[activeVideoIndex];
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -275,6 +286,7 @@ export default function Home() {
   };
 
   const handleNext = () => {
+    setIsTrailerActive(false);
     const wasPlaying = isPlaying;
     const nextIndex = (currentTrackIndex + 1) % TRACKS.length;
     const nextTrack = TRACKS[nextIndex];
@@ -301,6 +313,7 @@ export default function Home() {
   };
 
   const handlePrev = () => {
+    setIsTrailerActive(false);
     const wasPlaying = isPlaying;
     const prevIndex = (currentTrackIndex - 1 + TRACKS.length) % TRACKS.length;
     const prevTrack = TRACKS[prevIndex];
@@ -326,6 +339,7 @@ export default function Home() {
   };
 
   const selectTrack = (index: number) => {
+    setIsTrailerActive(false);
     const wasPlaying = isPlaying;
     const targetTrack = TRACKS[index];
     if (audioRef.current) {
@@ -345,6 +359,19 @@ export default function Home() {
           });
         }
       }, 100);
+    }
+  };
+
+  const handleToggleTrailer = () => {
+    track("click_trailer_toggle", { current_state: isTrailerActive });
+    if (!isTrailerActive) {
+      if (audioRef.current && isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+      setIsTrailerActive(true);
+    } else {
+      setIsTrailerActive(false);
     }
   };
 
@@ -568,111 +595,12 @@ export default function Home() {
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
         
-        {/* --- HERO VIDEO BLOCK --- */}
-        <section className="mb-12">
-          <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
-
-            {/* Video Box */}
-            <div className="relative aspect-video w-full rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
-              <iframe
-                src={`https://www.youtube.com/embed/${activeVideoClip.id}?autoplay=1&mute=${isVideoMuted ? 1 : 0}&loop=1&playlist=${activeVideoClip.id}&controls=1&rel=0&modestbranding=1`}
-                title={activeVideoClip.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
-              />
-              
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 pointer-events-none" />
-
-              {/* Removed Visual Console Badge */}
-
-              {/* Left Carousel Navigation */}
-              <button
-                onClick={() => {
-                  setActiveVideoIndex((prev) => (prev - 1 + VIDEO_CLIPS.length) % VIDEO_CLIPS.length);
-                  track("click_video_prev", { current_clip: activeVideoClip.title });
-                }}
-                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 border border-[#3e1d21] hover:border-[#ff003c] text-white p-2 rounded-full transition-all duration-300 z-20 active:scale-95"
-                aria-label="Previous Clip"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
-
-              {/* Right Carousel Navigation */}
-              <button
-                onClick={() => {
-                  setActiveVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length);
-                  track("click_video_next", { current_clip: activeVideoClip.title });
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 border border-[#3e1d21] hover:border-[#ff003c] text-white p-2 rounded-full transition-all duration-300 z-20 active:scale-95"
-                aria-label="Next Clip"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
-
-              {/* Title Overlay in Pretty Sidewalk Font - Centered on video to make YouTube player controls visible */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-10 text-center w-full max-w-[85%] px-4">
-                <span className="text-[9px] md:text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-1.5 font-sans">
-                  {activeVideoClip.badge}
-                </span>
-                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-tight py-1">
-                  {activeVideoClip.title}
-                </h1>
-                {activeVideoClip.feature && (
-                  <div className="text-xs sm:text-sm md:text-base text-zinc-400 font-mono tracking-wider uppercase mt-1">
-                    {activeVideoClip.feature}
-                  </div>
-                )}
-              </div>
-
-              {/* Carousel Indicators (Moved to top center to not block YouTube player controls) */}
-              <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
-                {VIDEO_CLIPS.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setActiveVideoIndex(idx);
-                      track("click_video_indicator", { target_index: idx, target_clip: VIDEO_CLIPS[idx].title });
-                    }}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      activeVideoIndex === idx 
-                        ? "w-4 bg-[#ff003c] shadow-[0_0_8px_#ff003c]" 
-                        : "w-1.5 bg-zinc-600 hover:bg-zinc-400"
-                    }`}
-                    aria-label={`Go to clip ${idx + 1}`}
-                  />
-                ))}
-              </div>
-
-              {/* Video control toggles (Moved to top right to not block YouTube player controls) */}
-              <div className="absolute top-6 right-6 flex items-center gap-2 z-20">
-                <button
-                  onClick={() => {
-                    setIsVideoMuted(!isVideoMuted);
-                    track("click_video_mute_toggle", { muted: !isVideoMuted });
-                  }}
-                  className="bg-black/85 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95"
-                  aria-label="Mute Toggle"
-                >
-                  {isVideoMuted ? <VolumeX size={14} className="text-[#ff003c]" /> : <Volume2 size={14} />}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* --- MUSIC & REAL AUDIO PLAYBACK HUB --- */}
+        {/* --- MULTIMEDIA TRANSMISSION HUB // CONSOLE --- */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-start">
           
-          {/* Cover Display Panel (5 Cols) */}
+          {/* LEFT COLUMN: Cover Display, Visualizer & Big Streaming Buttons */}
           <div className="lg:col-span-5 border border-[#221012] bg-[#0a0505] p-5 rounded-lg flex flex-col gap-4 relative">
-            {/* Removed Now Playing overlay */}
-
+            
             {/* Release Cover Display */}
             <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_25px_rgba(255,0,60,0.15)]">
               <Image
@@ -682,7 +610,7 @@ export default function Home() {
                 priority
                 className={`object-cover transition-transform duration-700 filter saturate-60 group-hover:saturate-100 ${isPlaying ? "scale-105" : "scale-100"}`}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
               
               <div className="absolute bottom-4 left-4">
                 <h3 className="text-3xl font-normal text-white font-sidewalk tracking-wide mt-1">{activeTrack.title}</h3>
@@ -715,31 +643,203 @@ export default function Home() {
                 toggle mode
               </button>
             </div>
+
+            {/* Song Links in Bigger Colors */}
+            <div className="space-y-2 mt-2">
+              <span className="text-[9px] text-zinc-500 uppercase tracking-widest block font-mono">// STREAM THIS TRACK DIRECT</span>
+              <div className="grid grid-cols-3 gap-2">
+                {activeTrack.spotifyUrl ? (
+                  <a
+                    href={activeTrack.spotifyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("click_track_spotify", { track_title: activeTrack.title })}
+                    className="flex flex-col items-center justify-center py-2.5 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                  >
+                    <span>SPOTIFY</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-center py-2.5 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                    N/A
+                  </div>
+                )}
+
+                {activeTrack.appleMusicUrl ? (
+                  <a
+                    href={activeTrack.appleMusicUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("click_track_apple", { track_title: activeTrack.title })}
+                    className="flex flex-col items-center justify-center py-2.5 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                  >
+                    <span>APPLE</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-center py-2.5 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                    N/A
+                  </div>
+                )}
+
+                {activeTrack.youtubeUrl ? (
+                  <a
+                    href={activeTrack.youtubeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("click_track_youtube", { track_title: activeTrack.title })}
+                    className="flex flex-col items-center justify-center py-2.5 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                  >
+                    <span>YOUTUBE</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-center py-2.5 rounded border border-zinc-900 bg-zinc-950/20 text-zinc-700 font-mono text-[9px] select-none text-center">
+                    N/A
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
 
-          {/* Player controls & playlist (7 Cols) */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
+          {/* RIGHT COLUMN: Video Screen, Controls & Interactive Tracklist */}
+          <div className="lg:col-span-7 flex flex-col gap-5">
             
-            {/* Audio Panel */}
-            <div className="border border-[#221012] bg-[#0a0505] p-6 rounded-lg relative overflow-hidden">
-              
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-mono">AUDIO FORMAT // WAV</span>
-                  <h2 className="text-sm font-bold uppercase tracking-widest text-[#ff003c] mt-1 font-mono">track controls</h2>
-                </div>
+            {/* Unified Video Box */}
+            <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
+              <div className="relative aspect-video w-full rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
+                <iframe
+                  src={
+                    isTrailerActive
+                      ? `https://www.youtube.com/embed/F4NdmdLr7_w?autoplay=1&mute=${isVideoMuted ? 1 : 0}&loop=1&playlist=F4NdmdLr7_w&controls=1&rel=0&modestbranding=1`
+                      : `https://www.youtube.com/embed/${activeTrack.youtubeVideoId}?autoplay=1&mute=${isVideoMuted ? 1 : 0}&loop=1&playlist=${activeTrack.youtubeVideoId}&controls=1&rel=0&modestbranding=1`
+                  }
+                  title={isTrailerActive ? "Digit Trailer" : activeTrack.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+                />
                 
-                <div className="flex items-center gap-1.5 bg-[#ff003c]/10 border border-[#ff003c]/30 px-2.5 py-1 rounded text-[9px] text-[#ff003c] font-bold font-mono">
-                  <span className={`inline-block h-1.5 w-1.5 rounded-full bg-[#ff003c] ${isPlaying ? "animate-pulse" : ""}`} />
-                  {isPlaying ? "playing" : "ready"}
+                {/* Visual Video Shade */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 pointer-events-none" />
+
+                {/* Info Text Overlay Centered */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-10 text-center w-full max-w-[85%] px-4">
+                  <span className="text-[9px] md:text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-1.5 font-sans">
+                    {isTrailerActive ? "Official Trailer" : activeTrack.videoBadge}
+                  </span>
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-tight py-1">
+                    {isTrailerActive ? "Digit" : activeTrack.title}
+                  </h1>
+                  {!isTrailerActive && activeTrack.feature && (
+                    <div className="text-xs sm:text-sm md:text-base text-zinc-400 font-mono tracking-wider uppercase mt-1">
+                      {activeTrack.feature}
+                    </div>
+                  )}
                 </div>
+
+                {/* Trailer Switcher Overlay (Top Left) */}
+                <div className="absolute top-4 left-4 z-20">
+                  <button
+                    onClick={handleToggleTrailer}
+                    className={`px-3 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border transition-all duration-300 active:scale-95 cursor-pointer ${
+                      isTrailerActive
+                        ? "bg-[#ff003c] text-black border-[#ff003c] shadow-[0_0_8px_#ff003c]"
+                        : "bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white"
+                    }`}
+                  >
+                    {isTrailerActive ? "SHOW TRACK VIDEO" : "WATCH TRAILER"}
+                  </button>
+                </div>
+
+                {/* Mute button overlay (Top Right) */}
+                <div className="absolute top-4 right-4 z-20">
+                  <button
+                    onClick={() => {
+                      setIsVideoMuted(!isVideoMuted);
+                      track("click_video_mute_toggle", { muted: !isVideoMuted });
+                    }}
+                    className="bg-black/85 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer"
+                    aria-label="Mute Toggle"
+                  >
+                    {isVideoMuted ? <VolumeX size={14} className="text-[#ff003c]" /> : <Volume2 size={14} />}
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Audio Panel & Playlist controls */}
+            <div className="border border-[#221012] bg-[#0a0505] p-5 rounded-lg flex flex-col gap-4">
+              
+              {/* Playback Controls Row */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#1b0d0e] pb-4">
+                
+                {/* Track Status */}
+                <div>
+                  <span className="text-[8px] text-zinc-500 uppercase tracking-widest font-mono block">NOW TRANSMITTING</span>
+                  <div className="text-[11px] font-bold text-white font-mono uppercase tracking-wider mt-0.5">
+                    {activeTrack.title} {activeTrack.feature && <span className="text-zinc-500 font-normal">({activeTrack.feature})</span>}
+                  </div>
+                </div>
+
+                {/* Core Player Buttons */}
+                <div className="flex items-center gap-2.5">
+                  <button 
+                    onClick={handlePrev}
+                    className="p-2 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                  >
+                    <SkipBack size={13} />
+                  </button>
+
+                  <button 
+                    onClick={handlePlayPause}
+                    className="px-6 py-2 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-[9px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,0,60,0.35)] cursor-pointer"
+                  >
+                    {isPlaying ? "PAUSE" : "PLAY"}
+                  </button>
+
+                  <button 
+                    onClick={handleNext}
+                    className="p-2 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                  >
+                    <SkipForward size={13} />
+                  </button>
+                </div>
+
+                {/* Volume Slider Control */}
+                <div className="flex items-center gap-2 bg-[#0c0707] border border-[#1c0f10] px-3 py-1.5 rounded w-full sm:w-auto justify-center sm:justify-start">
+                  <button
+                    onClick={() => {
+                      const nextVolume = volume === 0 ? 0.8 : 0;
+                      setVolume(nextVolume);
+                      track("click_volume_toggle", { muted: nextVolume === 0 });
+                    }}
+                    className="text-zinc-500 hover:text-[#ff003c] transition-colors shrink-0 active:scale-95 cursor-pointer"
+                    aria-label="Volume Toggle"
+                  >
+                    {volume === 0 ? <VolumeX size={12} className="text-[#ff003c]" /> : <Volume2 size={12} />}
+                  </button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={volume}
+                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                    onMouseUp={() => track("change_volume", { volume_level: volume })}
+                    onTouchEnd={() => track("change_volume", { volume_level: volume })}
+                    className="w-20 h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
+                  />
+                  <span className="text-[9px] text-zinc-500 font-mono w-6 text-right shrink-0">
+                    {Math.round(volume * 100)}%
+                  </span>
+                </div>
+
               </div>
 
-              {/* Progress Slider (Real Time) */}
-              <div className="space-y-1.5 mb-6">
-                <div className="flex justify-between text-[9px] text-zinc-500 font-mono">
+              {/* Progress Scrub Slider */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[8px] text-zinc-500 font-mono">
                   <span>{formatTime(currentTime)}</span>
-                  <span className="text-[#ff003c] font-sans tracking-widest uppercase text-[8px] opacity-75">stereo</span>
                   <span>{formatTime(duration)}</span>
                 </div>
                 <input
@@ -754,152 +854,62 @@ export default function Home() {
                 />
               </div>
 
-              {/* Player Controllers */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-5">
-                {/* Playback buttons */}
-                <div className="flex items-center gap-3">
-                  <button 
-                    onClick={handlePrev}
-                    className="p-2.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95"
-                  >
-                    <SkipBack size={15} />
-                  </button>
-
-                  <button 
-                    onClick={handlePlayPause}
-                    className="px-8 py-3 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-xs uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,0,60,0.35)]"
-                  >
-                    {isPlaying ? "PAUSE" : "PLAY"}
-                  </button>
-
-                  <button 
-                    onClick={handleNext}
-                    className="p-2.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95"
-                  >
-                    <SkipForward size={15} />
-                  </button>
-                </div>
-
-                {/* Volume Slider Control */}
-                <div className="flex items-center gap-2 bg-[#0c0707] border border-[#1c0f10] px-3 py-1.5 rounded w-full sm:w-auto justify-center sm:justify-start">
-                  <button
-                    onClick={() => {
-                      const nextVolume = volume === 0 ? 0.8 : 0;
-                      setVolume(nextVolume);
-                      track("click_volume_toggle", { muted: nextVolume === 0 });
-                    }}
-                    className="text-zinc-500 hover:text-[#ff003c] transition-colors shrink-0 active:scale-95"
-                    aria-label="Volume Toggle"
-                  >
-                    {volume === 0 ? <VolumeX size={13} className="text-[#ff003c]" /> : <Volume2 size={13} />}
-                  </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={volume}
-                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    onMouseUp={() => track("change_volume", { volume_level: volume })}
-                    onTouchEnd={() => track("change_volume", { volume_level: volume })}
-                    className="w-24 h-1 bg-[#1a0e10] rounded-lg appearance-none cursor-pointer accent-[#ff003c] focus:outline-none"
-                  />
-                  <span className="text-[9px] text-zinc-500 font-mono w-7 text-right shrink-0">
-                    {Math.round(volume * 100)}%
-                  </span>
-                </div>
-              </div>
-
-              {/* WAV Notice */}
-              <div className="border border-dashed border-[#341b1e] p-3 rounded bg-black/60 flex items-start gap-2.5">
-                <Headphones size={15} className="text-[#ff003c] shrink-0 mt-0.5" />
-                <span className="text-[9px] text-zinc-500 uppercase leading-relaxed font-sans">
-                  <strong className="text-zinc-300">RAW WAV FORMAT:</strong> these are the original uncompressed WAV files directly from the studio. raw transmission.
-                </span>
-              </div>
-            </div>
-
-            {/* Release Track list selection */}
-            <div className="border border-[#221012] bg-[#0a0505] p-5 rounded-lg flex-1">
-              <span className="text-[10px] text-zinc-500 uppercase tracking-widest block mb-4 font-sans">tracklist</span>
-              <div className="space-y-2">
-                {TRACKS.map((t, index) => {
-                  const isActive = currentTrackIndex === index;
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => selectTrack(index)}
-                      className={`w-full flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded transition-all text-left gap-3 cursor-pointer ${
-                        isActive 
-                          ? "bg-[#ff003c]/10 border border-[#ff003c]/30 text-white" 
-                          : "bg-black/40 border border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className={`text-[10px] font-bold ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <div className="min-w-0">
-                          <div className={`font-sidewalk text-base tracking-wide ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>{t.title}</div>
-                          {t.feature && (
-                            <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{t.feature}</div>
-                          )}
-                          <div className="text-[9px] text-zinc-500 tracking-wider mt-0.5">{t.album}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
-                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                          {t.spotifyUrl && (
-                            <a
-                              href={t.spotifyUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={() => track("click_track_spotify", { track_title: t.title })}
-                              className="text-[8px] text-zinc-500 hover:text-[#1db954] hover:border-[#1db954] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
-                            >
-                              spotify
-                            </a>
-                          )}
-                          {t.appleMusicUrl && (
-                            <a
-                              href={t.appleMusicUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={() => track("click_track_apple", { track_title: t.title })}
-                              className="text-[8px] text-zinc-500 hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
-                            >
-                              apple
-                            </a>
-                          )}
-                          {t.youtubeUrl && (
-                            <a
-                              href={t.youtubeUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={() => track("click_track_youtube", { track_title: t.title })}
-                              className="text-[8px] text-zinc-500 hover:text-[#ff0000] hover:border-[#ff0000] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
-                            >
-                              youtube
-                            </a>
-                          )}
-                        </div>
-                        {isActive && isPlaying ? (
-                          <div className="flex items-end gap-0.5 h-3 w-[28px] justify-end">
-                            <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
-                            <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
-                            <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
+              {/* Track Selection list */}
+              <div className="mt-1">
+                <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-2.5 font-sans">// SELECT TRANSMISSION</span>
+                <div className="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
+                  {TRACKS.map((t, index) => {
+                    const isActive = currentTrackIndex === index && !isTrailerActive;
+                    return (
+                      <div
+                        key={t.id}
+                        onClick={() => selectTrack(index)}
+                        className={`w-full flex items-center justify-between p-2.5 rounded transition-all text-left cursor-pointer border ${
+                          isActive 
+                            ? "bg-[#ff003c]/10 border-[#ff003c]/30 text-white" 
+                            : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className={`text-[9px] font-mono ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <div className="min-w-0">
+                            <span className={`font-sidewalk text-sm tracking-wide ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>
+                              {t.title}
+                            </span>
+                            {t.feature && (
+                              <span className="text-[9px] text-zinc-500 font-mono ml-2 lowercase">
+                                {t.feature}
+                              </span>
+                            )}
                           </div>
-                        ) : (
-                          <span className="text-[10px] text-zinc-500 w-[28px] text-right">{t.duration}</span>
-                        )}
+                        </div>
+
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <span className="text-[8px] text-zinc-500 font-mono uppercase border border-zinc-800/60 px-1.5 py-0.5 rounded bg-black/40">
+                            {t.album.includes("(") ? t.album.split("(")[0].trim() : t.album}
+                          </span>
+                          {isActive && isPlaying ? (
+                            <div className="flex items-end gap-0.5 h-2.5 w-[20px] justify-end">
+                              <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
+                              <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
+                              <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
+                            </div>
+                          ) : (
+                            <span className="text-[9px] text-zinc-500 font-mono w-[20px] text-right">{t.duration}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
+
             </div>
 
           </div>
+
         </section>
 
         {/* --- BIO SECTION --- */}
