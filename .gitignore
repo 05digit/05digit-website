@@ -41,7 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 # media assets (exceeds github 100mb limit)
-/songs/
 /videos/
-/photos/
 .npm-cache/
