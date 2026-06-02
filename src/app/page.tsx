@@ -27,11 +27,11 @@ const TRACKS: Track[] = [
     duration: "2:50",
     tempo: "140 BPM",
     description: "Lithuanian underground supertrap anthem. Blurring the lines between heavy digital slides and distorted sub frequencies.",
-    youtubeUrl: "https://www.youtube.com/watch?v=F4NdmdLr7_w"
+    youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8"
   },
   {
     id: "nebeskambink",
-    title: "Nebeskambink",
+    title: "Nebeskambink (feat. Obsalon)",
     album: "Nebeskambink (2025)",
     coverUrl: "/songs/nebeskambink cover.jpg",
     audioUrl: "/songs/nebeskambink final .wav",
@@ -42,7 +42,7 @@ const TRACKS: Track[] = [
   },
   {
     id: "apakau",
-    title: "apakau",
+    title: "apakau (feat. Atikin)",
     album: "apakau x perfect (2024)",
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
     audioUrl: "/songs/apakau feat atikin.wav",
@@ -118,23 +118,28 @@ interface VideoClip {
 const VIDEO_CLIPS: VideoClip[] = [
   {
     id: "F4NdmdLr7_w",
+    title: "Digit",
+    badge: "Official Artist Trailer"
+  },
+  {
+    id: "nNoiPOPh9j8",
     title: "Primityva",
-    badge: "OFFICIAL VISUALIZER"
+    badge: "Official Visualizer"
   },
   {
     id: "aX0aSpsqEy8",
-    title: "Nebeskambink",
-    badge: "OFFICIAL MUSIC VIDEO"
+    title: "Nebeskambink (feat. Obsalon)",
+    badge: "Official Music Video"
   },
   {
     id: "FRqvZ1aif4c",
-    title: "apakau",
-    badge: "OFFICIAL VISUALIZER"
+    title: "apakau (feat. Atikin)",
+    badge: "Official Visualizer"
   },
   {
     id: "fAP2UOOGTn4",
     title: "perfect",
-    badge: "OFFICIAL VISUALIZER"
+    badge: "Official Visualizer"
   }
 ];
 
@@ -155,7 +160,14 @@ export default function Home() {
   const animationFrameRef = useRef<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const isPlayingRef = useRef<boolean>(false);
+
   const activeTrack = TRACKS[currentTrackIndex];
+
+  // Keep play state ref synced with react state to fix canvas closure issues
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   // Initialize Web Audio context from user interaction
   const initAudioContext = () => {
@@ -191,7 +203,6 @@ export default function Home() {
       }
       audioRef.current.play().then(() => {
         setIsPlaying(true);
-        startVisualizer();
       }).catch(err => {
         console.error("Playback failed", err);
       });
@@ -216,7 +227,6 @@ export default function Home() {
           audioRef.current.load();
           audioRef.current.play().then(() => {
             setIsPlaying(true);
-            startVisualizer();
           });
         }
       }, 100);
@@ -240,7 +250,6 @@ export default function Home() {
           audioRef.current.load();
           audioRef.current.play().then(() => {
             setIsPlaying(true);
-            startVisualizer();
           });
         }
       }, 100);
@@ -262,7 +271,6 @@ export default function Home() {
           audioRef.current.load();
           audioRef.current.play().then(() => {
             setIsPlaying(true);
-            startVisualizer();
           });
         }
       }, 100);
@@ -324,7 +332,7 @@ export default function Home() {
         ctx.stroke();
       }
 
-      if (analyserRef.current && isPlaying) {
+      if (analyserRef.current && isPlayingRef.current) {
         analyserRef.current.getByteFrequencyData(dataArray);
       } else {
         // Idle pulsing
@@ -450,12 +458,12 @@ export default function Home() {
         <section className="mb-12">
           <div className="border border-[#281517] bg-[#0c0707] p-1.5 rounded-lg relative overflow-hidden group">
             {/* Accents */}
-            <div className="absolute top-3 left-4 text-[9px] text-zinc-500 font-mono tracking-widest">
-              [ TRANSMISSION_05D_ACTIVE ]
+            <div className="absolute top-3 left-4 text-[9px] text-zinc-500 font-mono tracking-widest z-20 pointer-events-none">
+              [ TRANS_ONLINE ]
             </div>
-            <div className="absolute top-3 right-4 text-[9px] text-[#ff003c] font-mono tracking-widest uppercase flex items-center gap-1.5">
+            <div className="absolute top-3 right-4 text-[9px] text-[#ff003c] font-mono tracking-widest uppercase flex items-center gap-1.5 z-20 pointer-events-none">
               <span className="h-1.5 w-1.5 rounded-full bg-[#ff003c] animate-pulse" />
-              DIGIT_VISUALIZER.MP4
+              VISUAL CONSOLE
             </div>
 
             {/* Video Box */}
@@ -471,29 +479,60 @@ export default function Home() {
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 pointer-events-none" />
 
+              {/* Left Carousel Navigation */}
+              <button
+                onClick={() => setActiveVideoIndex((prev) => (prev - 1 + VIDEO_CLIPS.length) % VIDEO_CLIPS.length)}
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 border border-[#3e1d21] hover:border-[#ff003c] text-white p-2 rounded-full transition-all duration-300 z-20 active:scale-95"
+                aria-label="Previous Clip"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+
+              {/* Right Carousel Navigation */}
+              <button
+                onClick={() => setActiveVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 border border-[#3e1d21] hover:border-[#ff003c] text-white p-2 rounded-full transition-all duration-300 z-20 active:scale-95"
+                aria-label="Next Clip"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
               {/* Title Overlay in Pretty Sidewalk Font */}
-              <div className="absolute bottom-6 left-6 md:left-8 pointer-events-none select-none z-10">
-                <span className="text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-2 font-sans">
+              <div className="absolute bottom-6 left-6 md:left-8 pointer-events-none select-none z-10 max-w-[55%]">
+                <span className="text-[9px] md:text-[10px] text-[#ff003c] tracking-[0.35em] uppercase font-bold block mb-1 font-sans">
                   {activeVideoClip.badge}
                 </span>
-                <h1 className="text-4xl md:text-7xl font-normal text-white uppercase font-sidewalk tracking-wide leading-none">
+                <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-normal text-white uppercase font-sidewalk tracking-wide leading-none truncate">
                   {activeVideoClip.title}
                 </h1>
               </div>
 
+              {/* Carousel Indicators */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
+                {VIDEO_CLIPS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveVideoIndex(idx)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      activeVideoIndex === idx 
+                        ? "w-4 bg-[#ff003c] shadow-[0_0_8px_#ff003c]" 
+                        : "w-1.5 bg-zinc-600 hover:bg-zinc-400"
+                    }`}
+                    aria-label={`Go to clip ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
               {/* Video control toggles */}
-              <div className="absolute bottom-6 right-6 flex items-center gap-2 z-10">
-                <button
-                  onClick={() => {
-                    setActiveVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length);
-                  }}
-                  className="bg-black/85 hover:bg-[#ff003c]/20 border border-[#3e1d21] hover:border-[#ff003c] text-white text-[9px] font-bold px-3 py-1.5 rounded tracking-widest uppercase transition-all duration-300 active:scale-95"
-                >
-                  SWITCH CLIP
-                </button>
+              <div className="absolute bottom-6 right-6 flex items-center gap-2 z-20">
                 <button
                   onClick={() => setIsVideoMuted(!isVideoMuted)}
                   className="bg-black/85 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95"
+                  aria-label="Mute Toggle"
                 >
                   {isVideoMuted ? <VolumeX size={14} className="text-[#ff003c]" /> : <Volume2 size={14} />}
                 </button>
@@ -507,8 +546,8 @@ export default function Home() {
           
           {/* Cover Display Panel (5 Cols) */}
           <div className="lg:col-span-5 border border-[#221012] bg-[#0a0505] p-5 rounded-lg flex flex-col gap-4 relative">
-            <div className="absolute top-2 right-4 text-[9px] text-zinc-600">
-              AUDIO_SOURCE // STAGE_1
+            <div className="absolute top-2 right-4 text-[9px] text-zinc-600 font-mono tracking-widest">
+              NOW PLAYING
             </div>
 
             {/* Release Cover Display */}
@@ -523,7 +562,6 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
               
               <div className="absolute bottom-4 left-4">
-                <span className="text-[9px] text-[#ff003c] tracking-widest uppercase font-bold block font-sans">LOADED_TRACK</span>
                 <h3 className="text-3xl font-normal text-white font-sidewalk tracking-wide mt-1">{activeTrack.title}</h3>
                 <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">{activeTrack.album}</p>
               </div>
@@ -538,7 +576,7 @@ export default function Home() {
                 className="w-full h-[55px] block opacity-95"
               />
               <div className="absolute top-1 left-2 text-[8px] text-zinc-600 uppercase tracking-widest">
-                REALTIME FREQUENCY DECODER
+                visualizer
               </div>
             </div>
           </div>
@@ -548,19 +586,16 @@ export default function Home() {
             
             {/* Audio Panel */}
             <div className="border border-[#221012] bg-[#0a0505] p-6 rounded-lg relative overflow-hidden">
-              <div className="absolute top-2 right-4 text-[9px] text-zinc-600">
-                DECODER_CONTROL // STAGE_2
-              </div>
               
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-sans">CORE AUDIO STREAM</span>
-                  <h2 className="text-xl font-normal text-[#ff003c] font-sidewalk tracking-widest mt-1">interactive deck</h2>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-sans">AUDIO FORMAT // WAV</span>
+                  <h2 className="text-xl font-normal text-[#ff003c] font-sidewalk tracking-widest mt-1">track controls</h2>
                 </div>
                 
                 <div className="flex items-center gap-1.5 bg-[#ff003c]/10 border border-[#ff003c]/30 px-2.5 py-1 rounded text-[9px] text-[#ff003c] font-bold">
                   <span className={`inline-block h-1.5 w-1.5 rounded-full bg-[#ff003c] ${isPlaying ? "animate-pulse" : ""}`} />
-                  {isPlaying ? "ACTIVE SIGNAL" : "SIGNAL DECK READY"}
+                  {isPlaying ? "playing" : "ready"}
                 </div>
               </div>
 
@@ -598,7 +633,7 @@ export default function Home() {
                   onClick={handlePlayPause}
                   className="px-8 py-3 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-xs uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,0,60,0.35)]"
                 >
-                  {isPlaying ? "PAUSE WAV STREAM" : "PLAY WAV STREAM"}
+                  {isPlaying ? "PAUSE" : "PLAY"}
                 </button>
 
                 <button 
@@ -613,14 +648,14 @@ export default function Home() {
               <div className="border border-dashed border-[#341b1e] p-3 rounded bg-black/60 flex items-start gap-2.5">
                 <Headphones size={15} className="text-[#ff003c] shrink-0 mt-0.5" />
                 <span className="text-[9px] text-zinc-500 uppercase leading-relaxed font-sans">
-                  <strong className="text-zinc-300">HQ AUDIO SOURCE:</strong> Currently playing your actual CD-quality WAV stems linked directly in the page player. Adjust slider to skip parts.
+                  <strong className="text-zinc-300">HI-RES AUDIO:</strong> Playing CD-quality WAV files. Use the controls above to navigate the track.
                 </span>
               </div>
             </div>
 
             {/* Release Track list selection */}
             <div className="border border-[#221012] bg-[#0a0505] p-5 rounded-lg flex-1">
-              <span className="text-[10px] text-zinc-500 uppercase tracking-widest block mb-4 font-sans">SELECT_TRACK // TRIGGER</span>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-widest block mb-4 font-sans">tracklist</span>
               <div className="space-y-2">
                 {TRACKS.map((track, index) => {
                   const isActive = currentTrackIndex === index;
@@ -669,13 +704,13 @@ export default function Home() {
           <div className="flex items-center justify-between mb-8 border-b border-[#221012] pb-4">
             <h2 className="text-xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk flex items-center gap-2">
               <Radio size={16} className="text-[#ff003c] animate-pulse" />
-              establish connection // stream link
+              stream & connect
             </h2>
-            <span className="text-[9px] text-zinc-500 font-sans uppercase">OFFICIAL REDIRECT MATRIX</span>
+            <span className="text-[9px] text-zinc-500 font-sans uppercase">official links</span>
           </div>
 
           <p className="text-xs text-zinc-500 uppercase tracking-widest mb-6 font-sans">
-            SELECT A PLATFORM IN THE SYSTEM GRID BELOW TO ESTABLISH AN IMMEDIATE AUDIO/VIDEO CONNECTION TO DIGIT'S CHANNELS:
+            select a platform below to stream or follow digit:
           </p>
 
           {/* Grid of Streaming redirects */}
@@ -689,9 +724,6 @@ export default function Home() {
                 className={`border border-[#1f0f11] bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] ${platform.color}`}
               >
                 <div>
-                  <span className="text-[8px] text-zinc-600 block tracking-widest mb-1 font-sans">
-                    REDIRECT_MATRIX_0{idx + 1}
-                  </span>
                   <h3 className="text-2xl font-normal font-sidewalk tracking-wide mt-1 mb-3">
                     {platform.name}
                   </h3>
