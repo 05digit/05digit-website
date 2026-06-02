@@ -1,7 +1,7 @@
 node_modules
 .next
 .npm-cache
-videos
+public/videos
 .git
 .DS_Store
 *.xlsx
