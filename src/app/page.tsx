@@ -512,7 +512,8 @@ export default function Home() {
         </div>
 
         {/* Centered Logo */}
-        <div className="flex justify-center items-center sm:w-2/4">
+        <div className="flex justify-center items-center sm:w-2/4 flex-col">
+          <h1 className="sr-only">05digit / digit / 05 Official Artist Website</h1>
           <span className="text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] hover:[text-shadow:0_0_1px_#ff003c] transition-[color,text-shadow] duration-300 cursor-pointer translate-y-[3px] md:translate-y-[4px]">
             digit
           </span>
@@ -720,7 +721,7 @@ export default function Home() {
                     <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL ARTIST TRAILER" : activeTrack.videoBadge}</span>
                   </div>
                   <h2 className="text-xl font-normal text-white uppercase font-sidewalk tracking-wide mt-0.5">
-                    {isTrailerActive ? "Digit" : activeTrack.title}
+                    {isTrailerActive ? "05digit // digit" : activeTrack.title}
                     {!isTrailerActive && activeTrack.feature && (
                       <span className="text-xs text-zinc-500 font-mono tracking-wider uppercase ml-2">
                         {activeTrack.feature}
@@ -863,7 +864,7 @@ export default function Home() {
               <span className="h-[1px] w-12 bg-[#2a1316]" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
-              about digit
+              about 05digit / digit
             </h2>
             <div className="space-y-4 text-sm text-zinc-400 font-sans leading-relaxed tracking-wide">
               <p>

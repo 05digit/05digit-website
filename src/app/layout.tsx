@@ -16,12 +16,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://05dig.it"),
   title: {
-    default: "digit | 05digit - official website",
-    template: "%s | digit"
+    default: "05digit // digit // 05 - Official Artist Website",
+    template: "%s | 05digit // digit"
   },
-  description: "Official workspace and website of Lithuanian underground artist digit (05digit). Stream 'Primityva', 'Nebeskambink', 'apakau', 'perfect', 'deja vu' and connect.",
+  description: "Official workspace and website of Lithuanian underground artist 05digit (aka digit / 05). Stream 'Primityva', 'Nebeskambink', 'apakau', 'perfect', 'deja vu' and connect.",
   keywords: [
-    "digit", "05digit", "og version", "furytto", "proflame", "xguscia", "free finga", 
+    "05digit", "digit", "05", "05 digit", "05_digit", "digit 05", "05-digit", "05 digit music",
+    "og version", "furytto", "proflame", "xguscia", "free finga", 
     "jessica shy", "lilas ir innomine", "sel 600", "g&g sindikatas", "solo ansamblis", 
     "mamis", "papi", "bielskis", "tautvydas burauskas", "despoting fam", "repas", 
     "atikin", "seneka", "dmnk", "conkretus", "mir", "kajuze", "morre", "urboo", 
@@ -34,9 +35,9 @@ export const metadata: Metadata = {
     "vilnius underground", "apakau", "perfect", "primityva", "nebeskambink", "deja vu", 
     "pasukta galva"
   ],
-  authors: [{ name: "digit" }],
-  creator: "digit",
-  publisher: "digit",
+  authors: [{ name: "05digit" }],
+  creator: "05digit",
+  publisher: "05digit",
   robots: {
     index: true,
     follow: true,
@@ -54,22 +55,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "lt_LT",
     url: "https://05dig.it",
-    title: "digit // 05digit - official website",
-    description: "Official workspace and website of Lithuanian underground artist digit (05digit). Stream latest tracks, watch visualizers, and connect.",
-    siteName: "digit",
+    title: "05digit // digit // 05 - Official Artist Website",
+    description: "Official workspace and website of Lithuanian underground artist 05digit (aka digit / 05). Stream latest tracks, watch visualizers, and connect.",
+    siteName: "05digit",
     images: [
       {
         url: "/songs/primityva cover v2 jpeg.jpg",
         width: 1200,
         height: 1200,
-        alt: "digit - Primityva Cover Art",
+        alt: "05digit - Primityva Cover Art",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "digit // 05digit - official website",
-    description: "Official workspace and website of Lithuanian underground artist digit (05digit). Stream latest tracks, watch visualizers, and connect.",
+    title: "05digit // digit // 05 - Official Artist Website",
+    description: "Official workspace and website of Lithuanian underground artist 05digit (aka digit / 05). Stream latest tracks, watch visualizers, and connect.",
     images: ["/songs/primityva cover v2 jpeg.jpg"],
   },
   icons: {
@@ -100,8 +101,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "MusicGroup",
-              "name": "digit",
-              "alternateName": ["05digit", "digit music"],
+              "name": "05digit",
+              "alternateName": ["digit", "05", "05 digit", "05_digit", "digit music"],
               "url": "https://05dig.it",
               "image": "https://05dig.it/songs/primityva%20cover%20v2%20jpeg.jpg",
               "description": "Lithuanian underground hip-hop and electronic music artist, known for blending hyperpop, trap, and drum & bass.",
