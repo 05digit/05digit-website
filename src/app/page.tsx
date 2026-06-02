@@ -12,9 +12,9 @@ interface Track {
   coverUrl: string;
   audioUrl: string;
   duration: string;
-  tempo: string; // BPM
-  description: string;
-  youtubeUrl?: string; // YouTube song links if available
+  spotifyUrl?: string;
+  appleMusicUrl?: string;
+  youtubeUrl?: string;
 }
 
 const TRACKS: Track[] = [
@@ -25,8 +25,8 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/primityva cover v2 jpeg.jpg",
     audioUrl: "/songs/primityva v2.wav",
     duration: "2:50",
-    tempo: "140 BPM",
-    description: "Lithuanian underground supertrap anthem. Blurring the lines between heavy digital slides and distorted sub frequencies.",
+    spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
+    appleMusicUrl: "https://music.apple.com/us/album/primityva-single/1557022026",
     youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8"
   },
   {
@@ -36,8 +36,8 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/nebeskambink cover.jpg",
     audioUrl: "/songs/nebeskambink final .wav",
     duration: "2:40",
-    tempo: "130 BPM",
-    description: "Dark atmosphere pad textures mixed with rapid-fire hi-hat rolls. Collaboration with Obsalon.",
+    spotifyUrl: "https://open.spotify.com/track/2ljYOhOpy6TTgy2UFxZKRN?si=3bf9a6c9cca84fbf",
+    appleMusicUrl: "https://music.apple.com/us/album/nebeskambink-single/1801874212",
     youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8"
   },
   {
@@ -47,8 +47,8 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
     audioUrl: "/songs/apakau feat atikin.wav",
     duration: "2:15",
-    tempo: "150 BPM",
-    description: "Feat. Atikin. Hyper-speed hat rolls, distorted slides and high-pitch synth bells.",
+    spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
+    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1769854728",
     youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c"
   },
   {
@@ -58,8 +58,8 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
     audioUrl: "/songs/perfect v4_Master.wav",
     duration: "3:05",
-    tempo: "145 BPM",
-    description: "Industrial darkwave bass fused with glitchy snare structures and atmospheric pads.",
+    spotifyUrl: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
+    appleMusicUrl: "https://music.apple.com/us/album/apakau-x-perfect-single/1769854728",
     youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4"
   }
 ];
@@ -587,11 +587,11 @@ export default function Home() {
               
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-sans">AUDIO FORMAT // WAV</span>
-                  <h2 className="text-sm font-bold uppercase tracking-widest text-[#ff003c] mt-1 font-sans">track controls</h2>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-mono">AUDIO FORMAT // WAV</span>
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-[#ff003c] mt-1 font-mono">track controls</h2>
                 </div>
                 
-                <div className="flex items-center gap-1.5 bg-[#ff003c]/10 border border-[#ff003c]/30 px-2.5 py-1 rounded text-[9px] text-[#ff003c] font-bold">
+                <div className="flex items-center gap-1.5 bg-[#ff003c]/10 border border-[#ff003c]/30 px-2.5 py-1 rounded text-[9px] text-[#ff003c] font-bold font-mono">
                   <span className={`inline-block h-1.5 w-1.5 rounded-full bg-[#ff003c] ${isPlaying ? "animate-pulse" : ""}`} />
                   {isPlaying ? "playing" : "ready"}
                 </div>
@@ -657,41 +657,62 @@ export default function Home() {
                     <button
                       key={track.id}
                       onClick={() => selectTrack(index)}
-                      className={`w-full flex items-center justify-between p-3 rounded transition-all text-left text-xs ${
+                      className={`w-full flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded transition-all text-left gap-3 ${
                         isActive 
                           ? "bg-[#ff003c]/10 border border-[#ff003c]/30 text-white" 
                           : "bg-black/40 border border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className={`text-[10px] font-bold ${isActive ? "text-[#ff003c]" : "text-zinc-600"}`}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className={`text-[10px] font-bold ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
                           {String(index + 1).padStart(2, "0")}
                         </span>
-                        <div>
+                        <div className="min-w-0">
                           <div className={`font-sidewalk text-base tracking-wide ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>{track.title}</div>
                           <div className="text-[9px] text-zinc-500 tracking-wider mt-0.5">{track.album}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {track.youtubeUrl && (
-                          <a
-                            href={track.youtubeUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-[9px] text-zinc-500 hover:text-[#ff003c] transition-all uppercase tracking-wider border border-zinc-800 hover:border-[#ff003c] px-2 py-0.5 rounded bg-black/40"
-                          >
-                            watch
-                          </a>
-                        )}
+                      <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          {track.spotifyUrl && (
+                            <a
+                              href={track.spotifyUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[8px] text-zinc-500 hover:text-[#1db954] hover:border-[#1db954] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
+                            >
+                              spotify
+                            </a>
+                          )}
+                          {track.appleMusicUrl && (
+                            <a
+                              href={track.appleMusicUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[8px] text-zinc-500 hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
+                            >
+                              apple
+                            </a>
+                          )}
+                          {track.youtubeUrl && (
+                            <a
+                              href={track.youtubeUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[8px] text-zinc-500 hover:text-[#ff0000] hover:border-[#ff0000] transition-all uppercase tracking-wider border border-zinc-800 px-1.5 py-0.5 rounded bg-black/60"
+                            >
+                              youtube
+                            </a>
+                          )}
+                        </div>
                         {isActive && isPlaying ? (
-                          <div className="flex items-end gap-0.5 h-3">
+                          <div className="flex items-end gap-0.5 h-3 w-[28px] justify-end">
                             <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
                             <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
                             <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
                           </div>
                         ) : (
-                          <span className="text-zinc-500">{track.duration}</span>
+                          <span className="text-[10px] text-zinc-500 w-[28px] text-right">{track.duration}</span>
                         )}
                       </div>
                     </button>

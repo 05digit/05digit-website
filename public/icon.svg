@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" fill="#050505"/>
+  <!-- Sharp, angular D logo matching the underground/supertrap aesthetic -->
+  <path d="M6 6h12l8 8v4l-8 8H6V6zm4 4v12h8l4-4v-4l-4-4h-8z" fill="#ff003c" />
+  <!-- Small offset glitch accents -->
+  <rect x="4" y="4" width="4" height="1" fill="#ff003c" opacity="0.6"/>
+  <rect x="24" y="27" width="4" height="1" fill="#ff003c" opacity="0.6"/>
+</svg>

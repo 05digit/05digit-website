@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "digit | 05digit",
   description: "Official website for underground artist digit aka 05digit. Stream music, watch official visualizers, and connect.",
+  icons: {
+    icon: "/icon.svg?v=2",
+    shortcut: "/icon.svg?v=2",
+    apple: "/icon.svg?v=2",
+  }
 };
 
 export default function RootLayout({
