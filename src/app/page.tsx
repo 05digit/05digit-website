@@ -73,9 +73,9 @@ const TRACKS: Track[] = [
     coverUrl: "/songs/deja vu.jpg",
     audioUrl: "/songs/deja vu.wav",
     duration: "2:09",
-    spotifyUrl: "https://open.spotify.com/track/6RMZ738QXWNQ2Jh4QjFk2h",
-    appleMusicUrl: "https://music.apple.com/us/album/deja-vu/1690560084?i=1690560087",
-    youtubeUrl: "https://www.youtube.com/watch?v=NpytYEC3Jg4"
+    spotifyUrl: "https://open.spotify.com/track/6RMZ738QXWNQ2Jh4QjFk2h?si=c39efe8e9c5443e9",
+    appleMusicUrl: "https://music.apple.com/lt/album/deja-vu/1804513622?i=1804513630",
+    youtubeUrl: "https://www.youtube.com/watch?v=TPwBpsgxirc"
   }
 ];
 
@@ -160,7 +160,7 @@ const VIDEO_CLIPS: VideoClip[] = [
     badge: "Official Visualizer"
   },
   {
-    id: "NpytYEC3Jg4",
+    id: "TPwBpsgxirc",
     title: "deja vu",
     badge: "Official Music Video"
   }
