@@ -450,7 +450,7 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-6 mb-16 items-stretch justify-center w-full min-h-[480px]">
           
           {/* COLUMN 1: COVER ART & LINKS */}
-          <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col max-w-md mx-auto lg:max-w-none ${
+          <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col max-w-md mx-auto lg:max-w-none ${
             isExpanded 
               ? "w-full lg:w-[25%] max-h-[1000px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
               : "w-full lg:w-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none relative lg:absolute -mt-6 lg:mt-0"
@@ -639,7 +639,7 @@ export default function Home() {
           </div>
 
           {/* COLUMN 3: TRACKLIST */}
-          <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col max-w-md mx-auto lg:max-w-none ${
+          <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col max-w-md mx-auto lg:max-w-none ${
             isExpanded 
               ? "w-full lg:w-[25%] max-h-[1000px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
               : "w-full lg:w-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none relative lg:absolute -mt-6 lg:mt-0"
