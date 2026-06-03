@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { track } from "@vercel/analytics";
 
@@ -15,25 +15,19 @@ export function VolumeSlider({
   isVideoMuted,
   setIsVideoMuted,
   onVolumeChangeCommit,
-  ytPlayerRef
+  ytPlayerRef,
 }: VolumeSliderProps) {
+  // localVolume is only used while the user is actively dragging.
+  // When idle, we render initialVolume (parent-owned state) directly to avoid sync issues.
   const [localVolume, setLocalVolume] = useState<number>(initialVolume);
   const localVolumeRef = useRef<number>(initialVolume);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const volumeBarRef = useRef<HTMLDivElement>(null);
 
-  // Sync with parent when not dragging (e.g. if unmuted by clicking play in parent)
-  // Disable next line rule about using refs during render since initial sync is a special case
-  // eslint-disable-next-line react-hooks/refs
-  if (!isDragging && initialVolume !== localVolumeRef.current) {
-    setLocalVolume(initialVolume);
-    // eslint-disable-next-line react-hooks/refs
-    localVolumeRef.current = initialVolume;
-  }
+  const displayVolume = isDragging ? localVolume : initialVolume;
 
   const applyVolumeToPlayer = (newVolume: number) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const player = ytPlayerRef.current as any;
+    const player = ytPlayerRef.current as Record<string, (...args: unknown[]) => void>;
     if (player && player.setVolume) {
       try {
         player.setVolume(newVolume * 100);
@@ -42,21 +36,38 @@ export function VolumeSlider({
         } else {
           player.unMute();
         }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (e) {}
+      } catch {
+        // YT player may not be ready yet
+      }
     }
   };
 
-  const handleMove = (clientY: number) => {
-    if (!volumeBarRef.current) return;
+  const getVolumeFromEvent = (
+    e:
+      | React.MouseEvent<HTMLDivElement>
+      | React.TouchEvent<HTMLDivElement>
+      | MouseEvent
+      | TouchEvent
+  ): number | null => {
+    if (!volumeBarRef.current) return null;
     const rect = volumeBarRef.current.getBoundingClientRect();
+    let clientY: number;
+    if ("touches" in e && e.touches.length > 0) {
+      clientY = e.touches[0].clientY;
+    } else if ("clientY" in e) {
+      clientY = e.clientY;
+    } else {
+      return null;
+    }
     const relativeY = clientY - rect.top;
-    const percentage = 1 - (relativeY / rect.height);
-    const newVolume = Math.max(0, Math.min(1, percentage));
+    const percentage = 1 - relativeY / rect.height;
+    return Math.max(0, Math.min(1, percentage));
+  };
 
+  const handleMove = (newVolume: number) => {
     setLocalVolume(newVolume);
+    localVolumeRef.current = newVolume;
     applyVolumeToPlayer(newVolume);
-
     if (newVolume > 0 && isVideoMuted) {
       setIsVideoMuted(false);
     } else if (newVolume === 0 && !isVideoMuted) {
@@ -64,48 +75,26 @@ export function VolumeSlider({
     }
   };
 
-  const handleVolumeClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    if (!volumeBarRef.current) return;
-    const clientY = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    handleMove(clientY);
-
-    // Calculate new volume to commit immediately on click
-    const rect = volumeBarRef.current.getBoundingClientRect();
-    const relativeY = clientY - rect.top;
-    const percentage = 1 - (relativeY / rect.height);
-    const newVolume = Math.max(0, Math.min(1, percentage));
+  const handleVolumeClick = (
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+  ) => {
+    const newVolume = getVolumeFromEvent(e);
+    if (newVolume === null) return;
+    handleMove(newVolume);
     onVolumeChangeCommit(newVolume);
   };
 
   useEffect(() => {
     if (!isDragging) return;
 
-    const handleMoveEffect = (clientY: number) => {
-      if (!volumeBarRef.current) return;
-      const rect = volumeBarRef.current.getBoundingClientRect();
-      const relativeY = clientY - rect.top;
-      const percentage = 1 - (relativeY / rect.height);
-      const newVolume = Math.max(0, Math.min(1, percentage));
-
-      setLocalVolume(newVolume);
-      localVolumeRef.current = newVolume;
-      applyVolumeToPlayer(newVolume);
-
-      if (newVolume > 0 && isVideoMuted) {
-        setIsVideoMuted(false);
-      } else if (newVolume === 0 && !isVideoMuted) {
-        setIsVideoMuted(true);
-      }
-    };
-
     const handleMouseMove = (e: MouseEvent) => {
-      handleMoveEffect(e.clientY);
+      const v = getVolumeFromEvent(e);
+      if (v !== null) handleMove(v);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        handleMoveEffect(e.touches[0].clientY);
-      }
+      const v = getVolumeFromEvent(e);
+      if (v !== null) handleMove(v);
     };
 
     const handleEnd = () => {
@@ -125,8 +114,11 @@ export function VolumeSlider({
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleEnd);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDragging, onVolumeChangeCommit, isVideoMuted, setIsVideoMuted]);
+    // handleMove captures isVideoMuted/setIsVideoMuted from closure — listing the
+    // dependencies would cause the effect to re-register on every mute toggle while
+    // dragging. Safe to omit here since isDragging gates the entire effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDragging, onVolumeChangeCommit]);
 
   return (
     <div className="flex flex-col items-center justify-between py-2 px-2 border border-[#2a1316]/50 bg-black/60 rounded gap-3 w-10 shrink-0">
@@ -140,10 +132,14 @@ export function VolumeSlider({
         className="bg-black/90 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer shrink-0"
         aria-label="Mute Toggle"
       >
-        {isVideoMuted ? <VolumeX size={12} className="text-[#ff003c]" /> : <Volume2 size={12} />}
+        {isVideoMuted ? (
+          <VolumeX size={12} className="text-[#ff003c]" />
+        ) : (
+          <Volume2 size={12} />
+        )}
       </button>
 
-      {/* Vertical Volume Slider (Custom drag handler) */}
+      {/* Vertical Volume Slider */}
       <div
         ref={volumeBarRef}
         onClick={handleVolumeClick}
@@ -162,7 +158,7 @@ export function VolumeSlider({
           {/* Active Fill Track */}
           <div
             className="w-full bg-[#ff003c] rounded-full relative"
-            style={{ height: `${localVolume * 100}%` }}
+            style={{ height: `${displayVolume * 100}%` }}
           >
             {/* Glow Handle/Thumb */}
             <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#ff003c] border border-white/20 rounded-full shadow-[0_0_8px_#ff003c] hover:scale-125 transition-transform duration-100" />
@@ -172,7 +168,7 @@ export function VolumeSlider({
 
       {/* Volume Label */}
       <span className="text-[7px] text-zinc-500 font-mono text-center shrink-0">
-        {Math.round(localVolume * 100)}%
+        {Math.round(displayVolume * 100)}%
       </span>
     </div>
   );

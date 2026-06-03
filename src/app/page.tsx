@@ -2,9 +2,21 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Play, Pause, SkipForward, SkipBack, Disc, Headphones, Radio } from "lucide-react";
+import { SkipForward, SkipBack } from "lucide-react";
+import { VolumeSlider } from "@/components/VolumeSlider";
 import { track } from "@vercel/analytics";
-import { VolumeSlider } from "../components/VolumeSlider";
+
+// Minimal type for the YouTube IFrame API player
+interface YTPlayer {
+  loadVideoById(opts: { videoId: string; startSeconds: number }): void;
+  playVideo(): void;
+  pauseVideo(): void;
+  getPlayerState(): number;
+  setVolume(volume: number): void;
+  mute(): void;
+  unMute(): void;
+  destroy(): void;
+}
 
 // --- Types ---
 interface Track {
@@ -13,7 +25,6 @@ interface Track {
   feature?: string;
   album: string;
   coverUrl: string;
-  audioUrl: string;
   duration: string;
   spotifyUrl?: string;
   appleMusicUrl?: string;
@@ -28,7 +39,6 @@ const TRACKS: Track[] = [
     title: "Primityva",
     album: "Primityva (2026)",
     coverUrl: "/songs/primityva cover v2 jpeg.jpg",
-    audioUrl: "/songs/primityva v2.wav",
     duration: "2:50",
     spotifyUrl: "https://open.spotify.com/track/0nfluE2XHeBqu0bX7AcrUh?si=30f34425ced64c95",
     appleMusicUrl: "https://music.apple.com/lt/album/primityva/6769248612?i=6769248795",
@@ -42,7 +52,6 @@ const TRACKS: Track[] = [
     feature: "feat. Obsalon",
     album: "Nebeskambink (2025)",
     coverUrl: "/songs/nebeskambink cover.jpg",
-    audioUrl: "/songs/nebeskambink final .wav",
     duration: "2:40",
     spotifyUrl: "https://open.spotify.com/track/2ljYOhOpy6TTgy2UFxZKRN?si=3bf9a6c9cca84fbf",
     appleMusicUrl: "https://music.apple.com/us/album/nebeskambink/1810770309?i=1810770311",
@@ -56,7 +65,6 @@ const TRACKS: Track[] = [
     feature: "feat. Atikin",
     album: "apakau x perfect (2024)",
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
-    audioUrl: "/songs/apakau feat atikin.wav",
     duration: "2:15",
     spotifyUrl: "https://open.spotify.com/track/1wlbcOYoSttIjHBcZr7NUB?si=15692867df4a4cc3",
     appleMusicUrl: "https://music.apple.com/us/album/apakau/1804514772?i=1804514773",
@@ -69,7 +77,6 @@ const TRACKS: Track[] = [
     title: "perfect",
     album: "apakau x perfect (2024)",
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
-    audioUrl: "/songs/perfect v4_Master.wav",
     duration: "3:05",
     spotifyUrl: "https://open.spotify.com/track/5P1zA17VR4tA3i98aOuBRK?si=dab4151a0b794fd9",
     appleMusicUrl: "https://music.apple.com/us/album/perfect/1804514772?i=1804514778",
@@ -82,7 +89,6 @@ const TRACKS: Track[] = [
     title: "deja vu",
     album: "22:22 (2023)",
     coverUrl: "/songs/deja vu.jpg",
-    audioUrl: "/songs/deja vu.wav",
     duration: "2:09",
     spotifyUrl: "https://open.spotify.com/track/6RMZ738QXWNQ2Jh4QjFk2h?si=c39efe8e9c5443e9",
     appleMusicUrl: "https://music.apple.com/lt/album/deja-vu/1804513622?i=1804513630",
@@ -95,7 +101,6 @@ const TRACKS: Track[] = [
     title: "Pasukta galva",
     album: "22:22 (2023)",
     coverUrl: "/songs/deja vu.jpg",
-    audioUrl: "/songs/deja vu.wav",
     duration: "2:08",
     spotifyUrl: "https://open.spotify.com/track/2HT9E1PaeGj6Rnh8GjIeXK?si=2178309151e84c92",
     appleMusicUrl: "https://music.apple.com/us/album/pasukta-galva/1804513622?i=1804513623",
@@ -150,47 +155,7 @@ const PLATFORMS = [
   }
 ];
 
-interface VideoClip {
-  id: string;
-  title: string;
-  feature?: string;
-  badge: string;
-}
 
-const VIDEO_CLIPS: VideoClip[] = [
-  {
-    id: "F4NdmdLr7_w",
-    title: "Digit",
-    badge: "Official Artist Trailer"
-  },
-  {
-    id: "nNoiPOPh9j8",
-    title: "Primityva",
-    badge: "Official Visualizer"
-  },
-  {
-    id: "aX0aSpsqEy8",
-    title: "Nebeskambink",
-    feature: "feat. Obsalon",
-    badge: "Official Music Video"
-  },
-  {
-    id: "FRqvZ1aif4c",
-    title: "apakau",
-    feature: "feat. Atikin",
-    badge: "Official Visualizer"
-  },
-  {
-    id: "fAP2UOOGTn4",
-    title: "perfect",
-    badge: "Official Visualizer"
-  },
-  {
-    id: "TPwBpsgxirc",
-    title: "deja vu",
-    badge: "Official Music Video"
-  }
-];
 
 export default function Home() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
@@ -200,13 +165,14 @@ export default function Home() {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.8);
 
-  const ytPlayerRef = useRef<any>(null);
+  const ytPlayerRef = useRef<YTPlayer | null>(null);
+  const initYoutubePlayerRef = useRef<() => void>(null as unknown as () => void);
 
   const isPlayingRef = useRef<boolean>(false);
   const volumeRef = useRef<number>(0.8);
   const currentTrackIndexRef = useRef<number>(0);
 
-  // Sync refs with React state to prevent stale closure bugs in player events
+  // Keep refs synced with React state to prevent stale closures in async player callbacks
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
@@ -260,7 +226,7 @@ export default function Home() {
     const container = document.getElementById("yt-player");
     if (!container || ytPlayerRef.current) return;
 
-    ytPlayerRef.current = new (window as any).YT.Player("yt-player", {
+    ytPlayerRef.current = new (window as unknown as { YT: { Player: new (...args: unknown[]) => YTPlayer } }).YT.Player("yt-player", {
       videoId: isTrailerActive ? "F4NdmdLr7_w" : TRACKS[currentTrackIndex].youtubeVideoId,
       playerVars: {
         autoplay: 0,
@@ -270,10 +236,10 @@ export default function Home() {
         mute: isVideoMuted ? 1 : 0,
       },
       events: {
-        onReady: (event: any) => {
+        onReady: (event: { target: YTPlayer }) => {
           event.target.setVolume(volumeRef.current * 100);
         },
-        onStateChange: (event: any) => {
+        onStateChange: (event: { data: number }) => {
           const playerState = event.data;
           // 1 = PLAYING, 2 = PAUSED, 0 = ENDED
           if (playerState === 1) {
@@ -294,6 +260,8 @@ export default function Home() {
     });
   };
 
+
+
   // Sync volume state with YT player
   useEffect(() => {
     if (ytPlayerRef.current && ytPlayerRef.current.setVolume) {
@@ -304,7 +272,7 @@ export default function Home() {
         } else {
           ytPlayerRef.current.unMute();
         }
-      } catch (e) {}
+      } catch {}
     }
   }, [volume]);
 
@@ -317,7 +285,7 @@ export default function Home() {
         } else {
           ytPlayerRef.current.unMute();
         }
-      } catch (e) {}
+      } catch {}
     }
   }, [isVideoMuted]);
 
@@ -339,7 +307,7 @@ export default function Home() {
         setIsPlaying(true);
         track("audio_play", { track_title: activeTrack.title });
       }
-    } catch (e) {}
+    } catch {}
   };
 
   const handleNext = () => {
@@ -356,65 +324,49 @@ export default function Home() {
     track("skip_prev", { track_title: TRACKS[prevIndex].title });
   };
 
-  const selectTrack = (index: number) => {
-    setIsTrailerActive(false);
-    setCurrentTrackIndex(index);
-    track("select_track", { track_title: TRACKS[index].title });
-
+  const playVideoById = (videoId: string) => {
     setIsVideoMuted(false);
     if (volume === 0) {
       setVolume(0.8);
     }
-
     if (ytPlayerRef.current && ytPlayerRef.current.loadVideoById) {
       try {
-        ytPlayerRef.current.loadVideoById({
-          videoId: TRACKS[index].youtubeVideoId,
-          startSeconds: 0
-        });
+        ytPlayerRef.current.loadVideoById({ videoId, startSeconds: 0 });
         ytPlayerRef.current.playVideo();
         setIsPlaying(true);
-      } catch (e) {}
+      } catch {}
     }
+  };
+
+  const selectTrack = (index: number) => {
+    setIsTrailerActive(false);
+    setCurrentTrackIndex(index);
+    track("select_track", { track_title: TRACKS[index].title });
+    playVideoById(TRACKS[index].youtubeVideoId);
   };
 
   const handleToggleTrailer = () => {
     track("click_trailer_toggle", { current_state: isTrailerActive });
     if (!ytPlayerRef.current || !ytPlayerRef.current.loadVideoById) return;
 
-    setIsVideoMuted(false);
-    if (volume === 0) {
-      setVolume(0.8);
+    if (!isTrailerActive) {
+      setIsTrailerActive(true);
+      playVideoById("F4NdmdLr7_w");
+    } else {
+      setIsTrailerActive(false);
+      playVideoById(activeTrack.youtubeVideoId);
     }
-
-    try {
-      if (!isTrailerActive) {
-        setIsTrailerActive(true);
-        ytPlayerRef.current.loadVideoById({
-          videoId: "F4NdmdLr7_w",
-          startSeconds: 0
-        });
-        ytPlayerRef.current.playVideo();
-        setIsPlaying(true);
-      } else {
-        setIsTrailerActive(false);
-        ytPlayerRef.current.loadVideoById({
-          videoId: activeTrack.youtubeVideoId,
-          startSeconds: 0
-        });
-        ytPlayerRef.current.playVideo();
-        setIsPlaying(true);
-      }
-    } catch (e) {}
   };
 
 
 
   // Mount / Unmount scripts and setup
   useEffect(() => {
-    // 1. Define callback globally
-    (window as any).onYouTubeIframeAPIReady = () => {
-      initYoutubePlayer();
+    // 1. Define callback globally — store initYoutubePlayer in a ref so
+    //    it can be updated without re-running this effect
+    initYoutubePlayerRef.current = initYoutubePlayer;
+    (window as unknown as { onYouTubeIframeAPIReady: () => void }).onYouTubeIframeAPIReady = () => {
+      initYoutubePlayerRef.current();
     };
 
     // 2. Load YouTube API script
@@ -427,9 +379,11 @@ export default function Home() {
       if (ytPlayerRef.current) {
         try {
           ytPlayerRef.current.destroy();
-        } catch (e) {}
+        } catch {}
       }
     };
+    // initYoutubePlayer is stored in a ref above; the effect intentionally runs once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -596,7 +550,11 @@ export default function Home() {
               <div className="border border-[#281517] bg-[#0c0707] p-2 rounded-lg flex flex-row gap-3 items-stretch relative overflow-hidden group">
                 {/* Target div for YouTube player loading */}
                 <div className="relative aspect-video flex-1 rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
-                  <div id="yt-player" className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
+                  <iframe
+                    id="yt-player"
+                    className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+                    sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"
+                  />
                 </div>
 
                 {/* Vertical Audio Controller on the Side */}
@@ -615,12 +573,12 @@ export default function Home() {
                 {/* Current Track Readout */}
                 <div className="flex flex-col gap-0.5 border-b border-[#1b0d0e] pb-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[8px] text-[#ff003c] font-mono tracking-widest uppercase">// NOW PLAYING</span>
+                    <span className="text-[8px] text-[#ff003c] font-mono tracking-widest uppercase">{"//"} NOW PLAYING</span>
                     <span className="h-[1px] w-4 bg-[#2a1316]" />
                     <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL ARTIST TRAILER" : activeTrack.videoBadge}</span>
                   </div>
                   <h2 className="text-xl font-normal text-white uppercase font-sidewalk tracking-wide mt-0.5">
-                    {isTrailerActive ? "05digit // digit" : activeTrack.title}
+                    {isTrailerActive ? "digit" : activeTrack.title}
                     {!isTrailerActive && activeTrack.feature && (
                       <span className="text-xs text-zinc-500 font-mono tracking-wider uppercase ml-2">
                         {activeTrack.feature}
@@ -643,6 +601,7 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={handlePrev}
+                      aria-label="Previous track"
                       className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
                     >
                       <SkipBack size={12} />
@@ -657,6 +616,7 @@ export default function Home() {
 
                     <button 
                       onClick={handleNext}
+                      aria-label="Next track"
                       className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
                     >
                       <SkipForward size={12} />
@@ -699,7 +659,7 @@ export default function Home() {
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col h-full justify-between">
               
               <div className="flex flex-col flex-1 min-h-0">
-                <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">// TRACKLIST</span>
+                <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">{"//"} TRACKLIST</span>
                 <div className="space-y-1.5 flex-1 overflow-y-auto pr-1">
                   {TRACKS.map((t, index) => {
                     const isActive = currentTrackIndex === index && !isTrailerActive;
@@ -759,11 +719,11 @@ export default function Home() {
           {/* Bio Text (7 Columns) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-2">
-              <span className="text-[#ff003c] font-bold font-mono text-xs">// BIO</span>
+              <span className="text-[#ff003c] font-bold font-mono text-xs">{"//"} BIO</span>
               <span className="h-[1px] w-12 bg-[#2a1316]" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
-              about 05digit / digit
+              about digit
             </h2>
             <div className="space-y-4 text-sm text-zinc-400 font-sans leading-relaxed tracking-wide">
               <p>
@@ -844,7 +804,7 @@ export default function Home() {
         {/* --- CONNECT / FOOTER PLATFORMS --- */}
         <section className="mb-16 border-t border-[#1a1112] pt-12">
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-[#ff003c] font-bold font-mono text-xs">// CONNECT</span>
+            <span className="text-[#ff003c] font-bold font-mono text-xs">{"//"} CONNECT</span>
             <span className="h-[1px] w-12 bg-[#2a1316]" />
           </div>
           
@@ -907,7 +867,7 @@ export default function Home() {
             </a>
           </div>
           <div>
-            &copy; {new Date().getFullYear()} Don't Got Time. All Rights Reserved.
+            &copy; {new Date().getFullYear()} Don&apos;t Got Time. All Rights Reserved.
           </div>
         </div>
       </footer>
