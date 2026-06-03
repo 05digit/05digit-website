@@ -68,11 +68,4 @@ input[type="range"]::-moz-range-thumb:hover {
   transform: scale(1.35);
 }
 
-/* Logo glow on hover */
-.logo-glow {
-  transition: filter 0.3s ease;
-}
 
-.logo-glow:hover {
-  filter: drop-shadow(0 0 8px #ff003c) drop-shadow(0 0 20px rgba(255,0,60,0.5));
-}
