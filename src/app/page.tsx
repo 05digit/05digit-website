@@ -450,15 +450,15 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-6 mb-16 items-stretch justify-center w-full min-h-[480px]">
           
           {/* COLUMN 1: COVER ART & LINKS */}
-          <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col ${
+          <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col max-w-md mx-auto lg:max-w-none ${
             isExpanded 
-              ? "w-full lg:w-[25%] max-h-[600px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
+              ? "w-full lg:w-[25%] max-h-[1000px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
               : "w-full lg:w-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none relative lg:absolute -mt-6 lg:mt-0"
           }`}>
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-6 h-full justify-center">
               
               {/* Cover Display */}
-              <div className="relative aspect-square w-full rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
+              <div className="relative aspect-square w-full max-w-[320px] lg:max-w-none mx-auto rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
                 <Image
                   src={displayTrack.coverUrl}
                   alt={displayTrack.title}
@@ -639,9 +639,9 @@ export default function Home() {
           </div>
 
           {/* COLUMN 3: TRACKLIST */}
-          <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col ${
+          <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col max-w-md mx-auto lg:max-w-none ${
             isExpanded 
-              ? "w-full lg:w-[25%] max-h-[600px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
+              ? "w-full lg:w-[25%] max-h-[1000px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
               : "w-full lg:w-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none relative lg:absolute -mt-6 lg:mt-0"
           }`}>
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col h-full justify-between">
