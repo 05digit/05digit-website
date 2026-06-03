@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Play, Pause, SkipForward, SkipBack, Disc, Headphones, Radio, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, Headphones, Radio, Volume2, VolumeX } from "lucide-react";
 import { track } from "@vercel/analytics";
 
 // --- Types ---
