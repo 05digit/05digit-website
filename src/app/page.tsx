@@ -658,7 +658,11 @@ export default function Home() {
               <div className="border border-[#281517] bg-[#0c0707] p-2 rounded-lg flex flex-row gap-3 items-stretch relative overflow-hidden group">
                 {/* Target div for YouTube player loading */}
                 <div className="relative aspect-video flex-1 rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
-                  <div id="yt-player" className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
+                  <iframe
+                    id="yt-player"
+                    className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+                    sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"
+                  />
                 </div>
 
                 {/* Vertical Audio Controller on the Side */}
@@ -721,7 +725,7 @@ export default function Home() {
                     <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL ARTIST TRAILER" : activeTrack.videoBadge}</span>
                   </div>
                   <h2 className="text-xl font-normal text-white uppercase font-sidewalk tracking-wide mt-0.5">
-                    {isTrailerActive ? "05digit // digit" : activeTrack.title}
+                    {isTrailerActive ? "digit" : activeTrack.title}
                     {!isTrailerActive && activeTrack.feature && (
                       <span className="text-xs text-zinc-500 font-mono tracking-wider uppercase ml-2">
                         {activeTrack.feature}
@@ -864,7 +868,7 @@ export default function Home() {
               <span className="h-[1px] w-12 bg-[#2a1316]" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
-              about 05digit / digit
+              about digit
             </h2>
             <div className="space-y-4 text-sm text-zinc-400 font-sans leading-relaxed tracking-wide">
               <p>
