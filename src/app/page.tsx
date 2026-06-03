@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Play, Pause, SkipForward, SkipBack, Disc, Headphones, Radio, Volume2, VolumeX } from "lucide-react";
+import { SkipForward, SkipBack, Volume2, VolumeX } from "lucide-react";
 import { track } from "@vercel/analytics";
 
 // --- Types ---
@@ -149,47 +149,6 @@ const PLATFORMS = [
   }
 ];
 
-interface VideoClip {
-  id: string;
-  title: string;
-  feature?: string;
-  badge: string;
-}
-
-const VIDEO_CLIPS: VideoClip[] = [
-  {
-    id: "F4NdmdLr7_w",
-    title: "Digit",
-    badge: "Official Artist Trailer"
-  },
-  {
-    id: "nNoiPOPh9j8",
-    title: "Primityva",
-    badge: "Official Visualizer"
-  },
-  {
-    id: "aX0aSpsqEy8",
-    title: "Nebeskambink",
-    feature: "feat. Obsalon",
-    badge: "Official Music Video"
-  },
-  {
-    id: "FRqvZ1aif4c",
-    title: "apakau",
-    feature: "feat. Atikin",
-    badge: "Official Visualizer"
-  },
-  {
-    id: "fAP2UOOGTn4",
-    title: "perfect",
-    badge: "Official Visualizer"
-  },
-  {
-    id: "TPwBpsgxirc",
-    title: "deja vu",
-    badge: "Official Music Video"
-  }
-];
 
 export default function Home() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
@@ -366,7 +325,7 @@ export default function Home() {
         } else {
           ytPlayerRef.current.unMute();
         }
-      } catch (e) {}
+      } catch {}
     }
   }, [volume]);
 
@@ -379,7 +338,7 @@ export default function Home() {
         } else {
           ytPlayerRef.current.unMute();
         }
-      } catch (e) {}
+      } catch {}
     }
   }, [isVideoMuted]);
 
@@ -401,7 +360,7 @@ export default function Home() {
         setIsPlaying(true);
         track("audio_play", { track_title: activeTrack.title });
       }
-    } catch (e) {}
+    } catch {}
   };
 
   const handleNext = () => {
@@ -436,7 +395,7 @@ export default function Home() {
         });
         ytPlayerRef.current.playVideo();
         setIsPlaying(true);
-      } catch (e) {}
+      } catch {}
     }
   };
 
@@ -467,7 +426,7 @@ export default function Home() {
         ytPlayerRef.current.playVideo();
         setIsPlaying(true);
       }
-    } catch (e) {}
+    } catch {}
   };
 
 
@@ -489,7 +448,7 @@ export default function Home() {
       if (ytPlayerRef.current) {
         try {
           ytPlayerRef.current.destroy();
-        } catch (e) {}
+        } catch {}
       }
     };
   }, []);
