@@ -385,7 +385,7 @@ export default function Home() {
       <div className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_4px,6px_100%]" />
 
       {/* --- HEADER --- */}
-      <header className="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-md border-b border-[#160a0b] px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-[#050505] border-b border-[#160a0b] px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Left Status Label */}
         <div className="flex items-center gap-2 text-[9px] text-zinc-500 font-mono tracking-widest sm:w-1/4 justify-center sm:justify-start">
           <span className="relative flex h-1.5 w-1.5">
