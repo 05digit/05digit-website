@@ -398,7 +398,7 @@ export default function Home() {
         {/* Centered Logo */}
         <div className="flex justify-center items-center sm:w-2/4 flex-col">
           <h1 className="sr-only">05digit / digit / 05 Official Artist Website</h1>
-          <span className="inline-block text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] transition-colors duration-300 cursor-pointer translate-y-[3px] md:translate-y-[4px]">
+          <span className="inline-block text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase hover:text-[#ff003c] transition-colors duration-300 cursor-pointer">
             digit
           </span>
         </div>
