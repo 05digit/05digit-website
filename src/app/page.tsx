@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Play, Pause, SkipForward, SkipBack, Disc, Headphones, Radio, Volume2, VolumeX } from "lucide-react";
+import { SkipForward, SkipBack, Headphones, Radio, Volume2, VolumeX } from "lucide-react";
 
 // --- Types ---
 interface Track {
@@ -165,7 +165,6 @@ export default function Home() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const isPlayingRef = useRef<boolean>(false);
   const visualizerModeRef = useRef<"bars" | "wave">("bars");
@@ -186,7 +185,7 @@ export default function Home() {
   const initAudioContext = () => {
     if (audioContextRef.current) return;
 
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     const ctx = new AudioContextClass();
     audioContextRef.current = ctx;
 
@@ -792,7 +791,7 @@ export default function Home() {
           {/* Bio Text (7 Columns) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-2">
-              <span className="text-[#ff003c] font-bold font-mono text-xs">// TRANSMISSION_BIO</span>
+              <span className="text-[#ff003c] font-bold font-mono text-xs">{"//"} TRANSMISSION_BIO</span>
               <span className="h-[1px] w-12 bg-[#2a1316]" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
@@ -927,7 +926,7 @@ export default function Home() {
             <a href="https://www.youtube.com/@05digit" target="_blank" rel="noreferrer" className="hover:text-[#ff003c] transition-colors">YouTube</a>
           </div>
           <div>
-            &copy; {new Date().getFullYear()} Don't Got Time.
+            &copy; {new Date().getFullYear()} Don&apos;t Got Time.
           </div>
         </div>
       </footer>
