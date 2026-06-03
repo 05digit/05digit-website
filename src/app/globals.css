@@ -68,12 +68,3 @@ input[type="range"]::-moz-range-thumb:hover {
   transform: scale(1.35);
 }
 
-/* Custom color filter to convert logo to exact #ff003c red on hover */
-.logo-hover-red {
-  transition: filter 0.3s ease;
-}
-
-.logo-hover-red:hover {
-  filter: brightness(0) saturate(100%) invert(23.98%) sepia(52.35%) saturate(2351.19%) hue-rotate(316.98deg) brightness(104.37%) contrast(168.32%) drop-shadow(0 0 1px #ff003c);
-}
-
