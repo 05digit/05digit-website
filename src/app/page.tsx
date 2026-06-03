@@ -418,11 +418,7 @@ export default function Home() {
     track("skip_prev", { track_title: TRACKS[prevIndex].title });
   };
 
-  const selectTrack = (index: number) => {
-    setIsTrailerActive(false);
-    setCurrentTrackIndex(index);
-    track("select_track", { track_title: TRACKS[index].title });
-
+  const playVideoById = (videoId: string) => {
     setIsVideoMuted(false);
     if (volume === 0) {
       setVolume(0.8);
@@ -431,7 +427,7 @@ export default function Home() {
     if (ytPlayerRef.current && ytPlayerRef.current.loadVideoById) {
       try {
         ytPlayerRef.current.loadVideoById({
-          videoId: TRACKS[index].youtubeVideoId,
+          videoId,
           startSeconds: 0
         });
         ytPlayerRef.current.playVideo();
@@ -440,34 +436,24 @@ export default function Home() {
     }
   };
 
+  const selectTrack = (index: number) => {
+    setIsTrailerActive(false);
+    setCurrentTrackIndex(index);
+    track("select_track", { track_title: TRACKS[index].title });
+    playVideoById(TRACKS[index].youtubeVideoId);
+  };
+
   const handleToggleTrailer = () => {
     track("click_trailer_toggle", { current_state: isTrailerActive });
     if (!ytPlayerRef.current || !ytPlayerRef.current.loadVideoById) return;
 
-    setIsVideoMuted(false);
-    if (volume === 0) {
-      setVolume(0.8);
+    if (!isTrailerActive) {
+      setIsTrailerActive(true);
+      playVideoById("F4NdmdLr7_w");
+    } else {
+      setIsTrailerActive(false);
+      playVideoById(activeTrack.youtubeVideoId);
     }
-
-    try {
-      if (!isTrailerActive) {
-        setIsTrailerActive(true);
-        ytPlayerRef.current.loadVideoById({
-          videoId: "F4NdmdLr7_w",
-          startSeconds: 0
-        });
-        ytPlayerRef.current.playVideo();
-        setIsPlaying(true);
-      } else {
-        setIsTrailerActive(false);
-        ytPlayerRef.current.loadVideoById({
-          videoId: activeTrack.youtubeVideoId,
-          startSeconds: 0
-        });
-        ytPlayerRef.current.playVideo();
-        setIsPlaying(true);
-      }
-    } catch (e) {}
   };
 
 
