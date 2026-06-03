@@ -1,0 +1,15 @@
+<<<<<<< SEARCH
+  const [volume, setVolume] = useState<number>(0.8);
+  const [isDraggingVolume, setIsDraggingVolume] = useState<boolean>(false);
+
+  const ytPlayerRef = useRef<any>(null);
+  const volumeBarRef = useRef<HTMLDivElement>(null);
+
+  const isPlayingRef = useRef<boolean>(false);
+=======
+  const [volume, setVolume] = useState<number>(0.8);
+
+  const ytPlayerRef = useRef<any>(null);
+
+  const isPlayingRef = useRef<boolean>(false);
+>>>>>>> REPLACE
