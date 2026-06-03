@@ -166,7 +166,6 @@ export default function Home() {
   const [volume, setVolume] = useState<number>(0.8);
 
   const ytPlayerRef = useRef<YTPlayer | null>(null);
-  const initYoutubePlayerRef = useRef<() => void>(null as unknown as () => void);
 
   const isPlayingRef = useRef<boolean>(false);
   const volumeRef = useRef<number>(0.8);
@@ -226,7 +225,7 @@ export default function Home() {
     const container = document.getElementById("yt-player");
     if (!container || ytPlayerRef.current) return;
 
-    ytPlayerRef.current = new (window as unknown as { YT: { Player: new (...args: unknown[]) => YTPlayer } }).YT.Player("yt-player", {
+    ytPlayerRef.current = new (window as unknown as { YT: { Player: new (id: string, opts: unknown) => YTPlayer } }).YT.Player("yt-player", {
       videoId: isTrailerActive ? "F4NdmdLr7_w" : TRACKS[currentTrackIndex].youtubeVideoId,
       playerVars: {
         autoplay: 0,
@@ -362,18 +361,19 @@ export default function Home() {
 
   // Mount / Unmount scripts and setup
   useEffect(() => {
-    // 1. Define callback globally — store initYoutubePlayer in a ref so
-    //    it can be updated without re-running this effect
-    initYoutubePlayerRef.current = initYoutubePlayer;
-    (window as unknown as { onYouTubeIframeAPIReady: () => void }).onYouTubeIframeAPIReady = () => {
-      initYoutubePlayerRef.current();
-    };
+    // 1. Register the YouTube API ready callback
+    (window as unknown as { onYouTubeIframeAPIReady: () => void }).onYouTubeIframeAPIReady = initYoutubePlayer;
 
-    // 2. Load YouTube API script
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName("script")[0];
-    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    // 2. Load the API script, or call immediately if the API is already cached
+    const win = window as unknown as { YT?: { Player: unknown } };
+    if (win.YT && win.YT.Player) {
+      initYoutubePlayer();
+    } else {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    }
 
     return () => {
       if (ytPlayerRef.current) {
@@ -382,9 +382,7 @@ export default function Home() {
         } catch {}
       }
     };
-    // initYoutubePlayer is stored in a ref above; the effect intentionally runs once on mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative min-h-screen bg-[#050505] text-[#f5f5f5] font-mono selection:bg-[#ff003c] selection:text-[#050505] overflow-x-hidden">
