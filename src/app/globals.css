@@ -68,3 +68,25 @@ input[type="range"]::-moz-range-thumb:hover {
   transform: scale(1.35);
 }
 
+/* Logo red hover — multiply overlay forces white font paths to turn red */
+.logo-wrapper {
+  position: relative;
+  display: inline-flex;
+  isolation: isolate;
+}
+
+.logo-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+  background: #ff003c;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.logo-wrapper:hover::after {
+  opacity: 1;
+}
+
