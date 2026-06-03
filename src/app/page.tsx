@@ -207,7 +207,7 @@ export default function Home() {
   const volumeRef = useRef<number>(0.8);
   const currentTrackIndexRef = useRef<number>(0);
 
-  // Sync refs with React state to prevent stale closure bugs in player events
+  // Keep play state ref synced with react state to fix canvas closure issues
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
