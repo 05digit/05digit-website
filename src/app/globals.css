@@ -68,25 +68,11 @@ input[type="range"]::-moz-range-thumb:hover {
   transform: scale(1.35);
 }
 
-/* Logo red hover — multiply overlay forces white font paths to turn red */
-.logo-wrapper {
-  position: relative;
-  display: inline-flex;
-  isolation: isolate;
+/* Logo glow on hover */
+.logo-glow {
+  transition: filter 0.3s ease;
 }
 
-.logo-wrapper::after {
-  content: '';
-  position: absolute;
-  inset: -8px -4px;
-  background: #ff003c;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.logo-glow:hover {
+  filter: drop-shadow(0 0 8px #ff003c) drop-shadow(0 0 20px rgba(255,0,60,0.5));
 }
-
-.logo-wrapper:hover::after {
-  opacity: 1;
-}
-

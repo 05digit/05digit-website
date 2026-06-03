@@ -398,11 +398,9 @@ export default function Home() {
         {/* Centered Logo */}
         <div className="flex justify-center items-center sm:w-2/4 flex-col">
           <h1 className="sr-only">05digit / digit / 05 Official Artist Website</h1>
-          <div className="logo-wrapper">
-            <span className="inline-block text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase cursor-pointer">
-              digit
-            </span>
-          </div>
+          <span className="inline-block text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase cursor-pointer transition-all duration-300 logo-glow">
+            digit
+          </span>
         </div>
 
         {/* Right Social Redirect Matrix (Vibrant / Clean) */}
