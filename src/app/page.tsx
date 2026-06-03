@@ -452,8 +452,8 @@ export default function Home() {
           {/* COLUMN 1: COVER ART & LINKS */}
           <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col ${
             isExpanded 
-              ? "w-full lg:w-[25%] opacity-100 scale-100" 
-              : "w-0 h-0 lg:h-auto opacity-0 scale-95 overflow-hidden pointer-events-none absolute lg:static"
+              ? "w-full lg:w-[25%] max-h-[600px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
+              : "w-full lg:w-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none relative lg:absolute -mt-6 lg:mt-0"
           }`}>
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-6 h-full justify-center">
               
@@ -641,8 +641,8 @@ export default function Home() {
           {/* COLUMN 3: TRACKLIST */}
           <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col ${
             isExpanded 
-              ? "w-full lg:w-[25%] opacity-100 scale-100" 
-              : "w-0 h-0 lg:h-auto opacity-0 scale-95 overflow-hidden pointer-events-none absolute lg:static"
+              ? "w-full lg:w-[25%] max-h-[600px] lg:max-h-none opacity-100 scale-100 relative lg:static pointer-events-auto mt-0" 
+              : "w-full lg:w-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none relative lg:absolute -mt-6 lg:mt-0"
           }`}>
             <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col h-full justify-between">
               
