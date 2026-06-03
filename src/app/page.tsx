@@ -114,42 +114,36 @@ const PLATFORMS = [
   {
     name: "Spotify",
     url: "https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw",
-    badge: "103_listeners/mo",
     color: "hover:bg-[#1db954]/10 hover:border-[#1db954] hover:text-[#1db954]",
     accent: "#1db954"
   },
   {
     name: "Apple Music",
     url: "https://music.apple.com/us/artist/digit/1524901037",
-    badge: "official_artist",
     color: "hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] hover:text-[#fc3c44]",
     accent: "#fc3c44"
   },
   {
     name: "YouTube Channel",
     url: "https://www.youtube.com/@05digit",
-    badge: "music_videos",
     color: "hover:bg-[#ff0000]/10 hover:border-[#ff0000] hover:text-[#ff0000]",
     accent: "#ff0000"
   },
   {
     name: "YouTube Music",
     url: "https://music.youtube.com/@05digit",
-    badge: "albums_singles",
     color: "hover:bg-[#ff003c]/10 hover:border-[#ff003c] hover:text-[#ff003c]",
     accent: "#ff003c"
   },
   {
     name: "Instagram",
     url: "https://www.instagram.com/05digit/",
-    badge: "@05digit",
     color: "hover:bg-[#e1306c]/10 hover:border-[#e1306c] hover:text-[#e1306c]",
     accent: "#e1306c"
   },
   {
     name: "TikTok",
     url: "https://www.tiktok.com/@05digit",
-    badge: "@05digit",
     color: "hover:bg-[#00f2fe]/10 hover:border-[#00f2fe] hover:text-[#00f2fe]",
     accent: "#00f2fe"
   }
@@ -801,7 +795,7 @@ export default function Home() {
         {/* --- CONNECT / FOOTER PLATFORMS --- */}
         <section className="mb-16 border-t border-[#1a1112] pt-12">
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-[#ff003c] font-bold font-mono text-xs">{"//"} CONNECT</span>
+            <span className="text-[#ff003c] font-bold font-mono text-xs">{"//"} STAY IN TOUCH</span>
             <span className="h-[1px] w-12 bg-[#2a1316]" />
           </div>
           
@@ -816,7 +810,6 @@ export default function Home() {
                 className={`border border-[#1f0f11] bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] ${platform.color}`}
               >
                 <div>
-                  <span className="text-[9px] text-zinc-500 font-mono tracking-widest uppercase block">{platform.badge}</span>
                   <h4 className="text-sm font-bold uppercase tracking-wider mt-1 font-mono">{platform.name}</h4>
                 </div>
                 <div className="flex justify-end mt-6">
