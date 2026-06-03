@@ -721,10 +721,13 @@ export default function Home() {
             </h2>
             <div className="space-y-4 text-sm text-zinc-400 font-sans leading-relaxed tracking-wide">
               <p>
-                Digit is a self-made artist from Lithuania, known in the underground scene for blurring the lines between hyperpop, punk, trap, drum &amp; bass, jersey club, and whatever else he feels like. <span className="text-white font-bold font-mono">Unpredictability is the point.</span>
+                Digit is an independent artist and creative from Vilnius, Lithuania. Winner of Pusės Dainos Festival 2023, he has been building his own sound since 2020 — rooted in hip-hop but never confined to it, drawing from whatever serves the core vision.
               </p>
               <p>
-                Growing up in Lithuania, Digit came from a family of creatives — orchestral musicians, theater and film actors — which shaped an open-minded approach to sound from an early age. Since picking up production in 2020, his music has been in constant sonic evolution, never settling long enough for anyone to pin him down.
+                Coming from a family of orchestral musicians and theater and film actors, a broad approach to sound and art was never a choice — it was just the environment. That foundation shows in how far his work extends: lyrics, production, mixing, mastering, photography, video, VFX, editing, management and even this website :D
+              </p>
+              <p>
+                He has collaborated closely with Lithuanian artists including Atikin, Nikobarisas, Jūsų Kilnybė, and producer Obsalon, while staying tapped into the international scene — including creative work with Seattle-based artist Adam Fadi.
               </p>
             </div>
             {/* Quick Stats Panel */}
