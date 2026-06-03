@@ -191,115 +191,6 @@ const VIDEO_CLIPS: VideoClip[] = [
   }
 ];
 
-interface VolumeSliderProps {
-  externalVolume: number;
-  onVolumeDrag: (volume: number) => void;
-  onVolumeDragEnd: (volume: number) => void;
-}
-
-function VolumeSlider({ externalVolume, onVolumeDrag, onVolumeDragEnd }: VolumeSliderProps) {
-  const [internalVolume, setInternalVolume] = useState(externalVolume);
-  const [isDragging, setIsDragging] = useState(false);
-  const volumeBarRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isDragging) {
-      setInternalVolume(externalVolume);
-    }
-  }, [externalVolume, isDragging]);
-
-  const handleVolumeClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    if (!volumeBarRef.current) return;
-    const rect = volumeBarRef.current.getBoundingClientRect();
-    const clientY = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    const relativeY = clientY - rect.top;
-    const percentage = 1 - (relativeY / rect.height);
-    const newVolume = Math.max(0, Math.min(1, percentage));
-    setInternalVolume(newVolume);
-    onVolumeDrag(newVolume);
-  };
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMove = (clientY: number) => {
-      if (!volumeBarRef.current) return;
-      const rect = volumeBarRef.current.getBoundingClientRect();
-      const relativeY = clientY - rect.top;
-      const percentage = 1 - (relativeY / rect.height);
-      const newVolume = Math.max(0, Math.min(1, percentage));
-      setInternalVolume(newVolume);
-      onVolumeDrag(newVolume);
-    };
-
-    const handleMouseMove = (e: MouseEvent) => handleMove(e.clientY);
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) handleMove(e.touches[0].clientY);
-    };
-
-    const handleEnd = () => {
-      setIsDragging(false);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleEnd);
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("touchend", handleEnd);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleEnd);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleEnd);
-    };
-  }, [isDragging, onVolumeDrag]);
-
-  // Sync back to parent when dragging finishes
-  const isDraggingRef = useRef(isDragging);
-  useEffect(() => {
-    if (isDraggingRef.current && !isDragging) {
-      onVolumeDragEnd(internalVolume);
-    }
-    isDraggingRef.current = isDragging;
-  }, [isDragging, internalVolume, onVolumeDragEnd]);
-
-  return (
-    <>
-      {/* Vertical Volume Slider (Custom drag handler) */}
-      <div
-        ref={volumeBarRef}
-        onClick={handleVolumeClick}
-        onMouseDown={(e) => {
-          setIsDragging(true);
-          handleVolumeClick(e);
-        }}
-        onTouchStart={(e) => {
-          setIsDragging(true);
-          handleVolumeClick(e);
-        }}
-        className="flex-1 w-full flex items-center justify-center cursor-pointer relative py-2 select-none"
-      >
-        {/* Track Background */}
-        <div className="w-1 h-full bg-[#1a0e10] rounded-full relative flex flex-col justify-end">
-          {/* Active Fill Track */}
-          <div
-            className="w-full bg-[#ff003c] rounded-full relative"
-            style={{ height: `${internalVolume * 100}%` }}
-          >
-            {/* Glow Handle/Thumb */}
-            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#ff003c] border border-white/20 rounded-full shadow-[0_0_8px_#ff003c] hover:scale-125 transition-transform duration-100" />
-          </div>
-        </div>
-      </div>
-
-      {/* Volume Label */}
-      <span className="text-[7px] text-zinc-500 font-mono text-center shrink-0">
-        {Math.round(internalVolume * 100)}%
-      </span>
-    </>
-  );
-}
-
 export default function Home() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -307,8 +198,10 @@ export default function Home() {
   const [isTrailerActive, setIsTrailerActive] = useState<boolean>(true);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.8);
+  const [isDraggingVolume, setIsDraggingVolume] = useState<boolean>(false);
 
   const ytPlayerRef = useRef<any>(null);
+  const volumeBarRef = useRef<HTMLDivElement>(null);
 
   const isPlayingRef = useRef<boolean>(false);
   const volumeRef = useRef<number>(0.8);
@@ -402,25 +295,66 @@ export default function Home() {
     });
   };
 
-  const handleVolumeDrag = React.useCallback((newVolume: number) => {
-    volumeRef.current = newVolume;
-    if (ytPlayerRef.current && ytPlayerRef.current.setVolume) {
-      try {
-        ytPlayerRef.current.setVolume(newVolume * 100);
-        if (newVolume === 0) {
-          ytPlayerRef.current.mute();
-        } else {
-          ytPlayerRef.current.unMute();
-        }
-      } catch (e) {}
-    }
-  }, []);
-
-  const handleVolumeDragEnd = React.useCallback((newVolume: number) => {
+  // Custom vertical volume slider handlers
+  const handleVolumeClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (!volumeBarRef.current) return;
+    const rect = volumeBarRef.current.getBoundingClientRect();
+    const clientY = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+    const relativeY = clientY - rect.top;
+    const percentage = 1 - (relativeY / rect.height);
+    const newVolume = Math.max(0, Math.min(1, percentage));
     setVolume(newVolume);
-    setIsVideoMuted(newVolume === 0);
-    track("change_volume", { volume_level: newVolume });
-  }, []);
+    if (newVolume > 0) {
+      setIsVideoMuted(false);
+    } else {
+      setIsVideoMuted(true);
+    }
+  };
+
+  useEffect(() => {
+    if (!isDraggingVolume) return;
+
+    const handleMove = (clientY: number) => {
+      if (!volumeBarRef.current) return;
+      const rect = volumeBarRef.current.getBoundingClientRect();
+      const relativeY = clientY - rect.top;
+      const percentage = 1 - (relativeY / rect.height);
+      const newVolume = Math.max(0, Math.min(1, percentage));
+      setVolume(newVolume);
+      if (newVolume > 0) {
+        setIsVideoMuted(false);
+      } else {
+        setIsVideoMuted(true);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleMove(e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientY);
+      }
+    };
+
+    const handleEnd = () => {
+      setIsDraggingVolume(false);
+      track("change_volume", { volume_level: volumeRef.current });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleEnd);
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleEnd);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleEnd);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleEnd);
+    };
+  }, [isDraggingVolume]);
 
   // Sync volume state with YT player
   useEffect(() => {
@@ -742,11 +676,37 @@ export default function Home() {
                     {isVideoMuted ? <VolumeX size={12} className="text-[#ff003c]" /> : <Volume2 size={12} />}
                   </button>
 
-                  <VolumeSlider
-                    externalVolume={volume}
-                    onVolumeDrag={handleVolumeDrag}
-                    onVolumeDragEnd={handleVolumeDragEnd}
-                  />
+                  {/* Vertical Volume Slider (Custom drag handler) */}
+                  <div
+                    ref={volumeBarRef}
+                    onClick={handleVolumeClick}
+                    onMouseDown={(e) => {
+                      setIsDraggingVolume(true);
+                      handleVolumeClick(e);
+                    }}
+                    onTouchStart={(e) => {
+                      setIsDraggingVolume(true);
+                      handleVolumeClick(e);
+                    }}
+                    className="flex-1 w-full flex items-center justify-center cursor-pointer relative py-2 select-none"
+                  >
+                    {/* Track Background */}
+                    <div className="w-1 h-full bg-[#1a0e10] rounded-full relative flex flex-col justify-end">
+                      {/* Active Fill Track */}
+                      <div
+                        className="w-full bg-[#ff003c] rounded-full relative"
+                        style={{ height: `${volume * 100}%` }}
+                      >
+                        {/* Glow Handle/Thumb */}
+                        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#ff003c] border border-white/20 rounded-full shadow-[0_0_8px_#ff003c] hover:scale-125 transition-transform duration-100" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Volume Label */}
+                  <span className="text-[7px] text-zinc-500 font-mono text-center shrink-0">
+                    {Math.round(volume * 100)}%
+                  </span>
                 </div>
               </div>
 
