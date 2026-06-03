@@ -721,7 +721,7 @@ export default function Home() {
                     <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL ARTIST TRAILER" : activeTrack.videoBadge}</span>
                   </div>
                   <h2 className="text-xl font-normal text-white uppercase font-sidewalk tracking-wide mt-0.5">
-                    {isTrailerActive ? "05digit // digit" : activeTrack.title}
+                    {isTrailerActive ? "digit" : activeTrack.title}
                     {!isTrailerActive && activeTrack.feature && (
                       <span className="text-xs text-zinc-500 font-mono tracking-wider uppercase ml-2">
                         {activeTrack.feature}
@@ -864,7 +864,7 @@ export default function Home() {
               <span className="h-[1px] w-12 bg-[#2a1316]" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
-              about 05digit / digit
+              about digit
             </h2>
             <div className="space-y-4 text-sm text-zinc-400 font-sans leading-relaxed tracking-wide">
               <p>
