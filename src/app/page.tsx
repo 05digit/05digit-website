@@ -548,11 +548,7 @@ export default function Home() {
               <div className="border border-[#281517] bg-[#0c0707] p-2 rounded-lg flex flex-row gap-3 items-stretch relative overflow-hidden group">
                 {/* Target div for YouTube player loading */}
                 <div className="relative aspect-video flex-1 rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
-                  <iframe
-                    id="yt-player"
-                    className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
-                    sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-                  />
+                    <div id="yt-player" className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
                 </div>
 
                 {/* Vertical Audio Controller on the Side */}
