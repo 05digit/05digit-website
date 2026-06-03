@@ -745,6 +745,7 @@ export default function Home() {
                     <button 
                       onClick={handlePrev}
                       className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                      aria-label="Previous track"
                     >
                       <SkipBack size={12} />
                     </button>
@@ -759,6 +760,7 @@ export default function Home() {
                     <button 
                       onClick={handleNext}
                       className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                      aria-label="Next track"
                     >
                       <SkipForward size={12} />
                     </button>
