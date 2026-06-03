@@ -12,7 +12,6 @@ interface Track {
   feature?: string;
   album: string;
   coverUrl: string;
-  audioUrl: string;
   duration: string;
   spotifyUrl?: string;
   appleMusicUrl?: string;
@@ -27,7 +26,6 @@ const TRACKS: Track[] = [
     title: "Primityva",
     album: "Primityva (2026)",
     coverUrl: "/songs/primityva cover v2 jpeg.jpg",
-    audioUrl: "/songs/primityva v2.wav",
     duration: "2:50",
     spotifyUrl: "https://open.spotify.com/track/0nfluE2XHeBqu0bX7AcrUh?si=30f34425ced64c95",
     appleMusicUrl: "https://music.apple.com/lt/album/primityva/6769248612?i=6769248795",
@@ -41,7 +39,6 @@ const TRACKS: Track[] = [
     feature: "feat. Obsalon",
     album: "Nebeskambink (2025)",
     coverUrl: "/songs/nebeskambink cover.jpg",
-    audioUrl: "/songs/nebeskambink final .wav",
     duration: "2:40",
     spotifyUrl: "https://open.spotify.com/track/2ljYOhOpy6TTgy2UFxZKRN?si=3bf9a6c9cca84fbf",
     appleMusicUrl: "https://music.apple.com/us/album/nebeskambink/1810770309?i=1810770311",
@@ -55,7 +52,6 @@ const TRACKS: Track[] = [
     feature: "feat. Atikin",
     album: "apakau x perfect (2024)",
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
-    audioUrl: "/songs/apakau feat atikin.wav",
     duration: "2:15",
     spotifyUrl: "https://open.spotify.com/track/1wlbcOYoSttIjHBcZr7NUB?si=15692867df4a4cc3",
     appleMusicUrl: "https://music.apple.com/us/album/apakau/1804514772?i=1804514773",
@@ -68,7 +64,6 @@ const TRACKS: Track[] = [
     title: "perfect",
     album: "apakau x perfect (2024)",
     coverUrl: "/songs/apakau (feat Atikin) x perfect.jpg",
-    audioUrl: "/songs/perfect v4_Master.wav",
     duration: "3:05",
     spotifyUrl: "https://open.spotify.com/track/5P1zA17VR4tA3i98aOuBRK?si=dab4151a0b794fd9",
     appleMusicUrl: "https://music.apple.com/us/album/perfect/1804514772?i=1804514778",
@@ -81,7 +76,6 @@ const TRACKS: Track[] = [
     title: "deja vu",
     album: "22:22 (2023)",
     coverUrl: "/songs/deja vu.jpg",
-    audioUrl: "/songs/deja vu.wav",
     duration: "2:09",
     spotifyUrl: "https://open.spotify.com/track/6RMZ738QXWNQ2Jh4QjFk2h?si=c39efe8e9c5443e9",
     appleMusicUrl: "https://music.apple.com/lt/album/deja-vu/1804513622?i=1804513630",
@@ -94,7 +88,6 @@ const TRACKS: Track[] = [
     title: "Pasukta galva",
     album: "22:22 (2023)",
     coverUrl: "/songs/deja vu.jpg",
-    audioUrl: "/songs/deja vu.wav",
     duration: "2:08",
     spotifyUrl: "https://open.spotify.com/track/2HT9E1PaeGj6Rnh8GjIeXK?si=2178309151e84c92",
     appleMusicUrl: "https://music.apple.com/us/album/pasukta-galva/1804513622?i=1804513623",
