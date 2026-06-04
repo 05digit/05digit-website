@@ -597,7 +597,8 @@ export default function Home() {
 
                     <button 
                       onClick={handlePlayPause}
-                      className="px-5 py-1.5 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-[8px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(255,0,60,0.35)] cursor-pointer"
+                      aria-label={isPlaying ? "Pause track" : "Play track"}
+                      className="px-5 py-1.5 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-[8px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(255,0,60,0.35)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
                     >
                       {isPlaying ? "PAUSE" : "PLAY"}
                     </button>
@@ -652,10 +653,11 @@ export default function Home() {
                   {TRACKS.map((t, index) => {
                     const isActive = currentTrackIndex === index && !isTrailerActive;
                     return (
-                      <div
+                      <button
                         key={t.id}
                         onClick={() => selectTrack(index)}
-                        className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border ${
+                        aria-current={isActive ? "true" : undefined}
+                        className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] ${
                           isActive 
                             ? "bg-[#ff003c]/10 border-[#ff003c]/30 text-white" 
                             : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
@@ -691,7 +693,7 @@ export default function Home() {
                         <div className="text-[8px] text-zinc-600 font-sans tracking-wide pl-4 mt-0.5">
                           {t.album.includes("(") ? t.album.split("(")[0].trim() : t.album}
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

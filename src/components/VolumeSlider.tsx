@@ -129,8 +129,8 @@ export function VolumeSlider({
           setIsVideoMuted(nextMute);
           track("click_video_mute_toggle", { muted: nextMute });
         }}
-        className="bg-black/90 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer shrink-0"
-        aria-label="Mute Toggle"
+        className="bg-black/90 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
+        aria-label={isVideoMuted ? "Unmute" : "Mute"}
       >
         {isVideoMuted ? (
           <VolumeX size={12} className="text-[#ff003c]" />
@@ -142,6 +142,12 @@ export function VolumeSlider({
       {/* Vertical Volume Slider */}
       <div
         ref={volumeBarRef}
+        role="slider"
+        aria-label="Volume"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(displayVolume * 100)}
+        tabIndex={0}
         onClick={handleVolumeClick}
         onMouseDown={(e) => {
           setIsDragging(true);
@@ -151,7 +157,21 @@ export function VolumeSlider({
           setIsDragging(true);
           handleVolumeClick(e);
         }}
-        className="flex-1 w-full flex items-center justify-center cursor-pointer relative py-2 select-none"
+        onKeyDown={(e) => {
+          const step = 0.05; // 5%
+          if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+            e.preventDefault();
+            const newVolume = Math.min(1, displayVolume + step);
+            handleMove(newVolume);
+            onVolumeChangeCommit(newVolume);
+          } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+            e.preventDefault();
+            const newVolume = Math.max(0, displayVolume - step);
+            handleMove(newVolume);
+            onVolumeChangeCommit(newVolume);
+          }
+        }}
+        className="flex-1 w-full flex items-center justify-center cursor-pointer relative py-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] focus-visible:rounded"
       >
         {/* Track Background */}
         <div className="w-1 h-full bg-[#1a0e10] rounded-full relative flex flex-col justify-end">
