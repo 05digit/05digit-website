@@ -590,7 +590,7 @@ export default function Home() {
                     <button 
                       onClick={handlePrev}
                       aria-label="Previous track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
                     >
                       <SkipBack size={12} />
                     </button>
@@ -606,7 +606,7 @@ export default function Home() {
                     <button 
                       onClick={handleNext}
                       aria-label="Next track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
                     >
                       <SkipForward size={12} />
                     </button>
@@ -616,7 +616,7 @@ export default function Home() {
                   {!isTrailerActive && (
                     <button
                       onClick={handleToggleTrailer}
-                      className="px-4 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white transition-all duration-300 active:scale-95 cursor-pointer w-full sm:w-auto"
+                      className="px-4 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white transition-all duration-300 active:scale-95 cursor-pointer w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
                     >
                       WATCH TRAILER
                     </button>
@@ -628,7 +628,9 @@ export default function Home() {
                 <div className="transition-all duration-700 ease-in-out w-full mt-1">
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="w-full py-2 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)]"
+                    aria-expanded={isExpanded}
+                    aria-controls="tracklist-panel"
+                    className="w-full py-2 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
                   >
                     {isExpanded ? "COLLAPSE" : "MORE MUSIC"}
                   </button>
@@ -640,7 +642,9 @@ export default function Home() {
           </div>
 
           {/* COLUMN 3: TRACKLIST */}
-          <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col items-start max-w-md mx-auto lg:max-w-none relative ${
+          <div
+            id="tracklist-panel"
+            className={`transition-all duration-700 ease-in-out origin-left flex flex-col items-start max-w-md mx-auto lg:max-w-none relative ${
             isExpanded 
               ? "w-full lg:w-[25%] lg:ml-6 max-h-[1000px] lg:max-h-none opacity-100 scale-100 pointer-events-auto mt-0" 
               : "w-full lg:w-0 lg:ml-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none -mt-6 lg:mt-0"
