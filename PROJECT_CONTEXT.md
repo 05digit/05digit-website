@@ -41,13 +41,19 @@ This document serves as a persistent context log for the official artist website
   </span>
   ```
 
-### 2. Custom Vertical Volume Dragging (`page.tsx`)
-* Uses custom `onMouseDown` and `onTouchStart` event listeners bound to the window during active drags to track movement, calculating the percentage based on bounding rectangle height.
+### 2. Custom Vertical Volume Dragging (`src/components/VolumeSlider.tsx`)
+* Extracted the vertical volume slider dragging and mute state loop into a separate component to isolate local state, preventing 60+ full-page global React re-renders per second during active dragging.
 
 ### 3. Dynamic Sitemap & Robots Configuration
 * Configured dynamic App Router sitemaps (`src/app/sitemap.ts`) and robots configurations (`src/app/robots.ts`) generating index maps live on production build:
   * Robots endpoint: `https://05dig.it/robots.txt`
   * Sitemap endpoint: `https://05dig.it/sitemap.xml`
+
+### 4. Dynamic Album-Reactive Themes (`globals.css` & `page.tsx`)
+* Dynamically sets inline CSS variable `--theme-color` on the root page container based on the selected track's theme configurations. Tailwind v4 color theme utility `theme-accent` maps to this variable, automatically adjusting selection borders, glow shadows, buttons, active track states, and logo glows on hover.
+
+### 5. Scroll-Reveal Viewport Animations
+* Implemented a lightweight `IntersectionObserver` hook inside `page.tsx` to automatically append a `.revealed` class to elements carrying `.reveal`. CSS properties transition elements smoothly via custom cubic-bezier curves for a premium visual flow as the page is scrolled.
 
 ---
 
@@ -61,15 +67,11 @@ This document serves as a persistent context log for the official artist website
 
 ## 📋 Pending Tasks & Optimization Roadmap
 
-### 1. Performance Optimization (Isolating Volume Re-renders)
-* **Owner:** Jules (or performance optimization agents)
-* **Goal:** Extract the custom vertical volume slider drag loop and local state out of the global `Home` component in `src/app/page.tsx`. Current implementation triggers 60+ full-page React re-renders per second during active dragging.
-
-### 2. Code Quality Optimization (Playback Control Duplication)
+### 1. Code Quality Optimization (Playback Control Duplication)
 * **Owner:** Refactoring/code quality agents
 * **Goal:** Merge duplicate unmuting, volume adjustments, and iframe video-loading logic shared between `selectTrack` and `handleToggleTrailer` in `src/app/page.tsx` into a single helper method: `playVideoById(videoId: string)`.
 
-### 3. Google Search Console & Indexing
+### 2. Google Search Console & Indexing
 * **Owner:** Project Owner / Developer
 * **Status:** Site verified via Vercel TXT records.
 * **Action Required:** Submit the `sitemap.xml` on Google Search Console, trigger a manual Inspection on `https://05dig.it/`, and request immediate indexation.
