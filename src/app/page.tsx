@@ -46,7 +46,7 @@ const TRACKS: Track[] = [
     youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8",
     youtubeVideoId: "nNoiPOPh9j8",
     videoBadge: "Official Visualizer",
-    themeColor: "#ff003c"
+    themeColor: "#535844"
   },
   {
     id: "nebeskambink",
@@ -60,7 +60,7 @@ const TRACKS: Track[] = [
     youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8",
     youtubeVideoId: "aX0aSpsqEy8",
     videoBadge: "Official Music Video",
-    themeColor: "#00d2ff"
+    themeColor: "#a74444"
   },
   {
     id: "apakau",
@@ -74,7 +74,7 @@ const TRACKS: Track[] = [
     youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c",
     youtubeVideoId: "FRqvZ1aif4c",
     videoBadge: "Official Visualizer",
-    themeColor: "#ffaa00"
+    themeColor: "#e0dcdc"
   },
   {
     id: "perfect",
@@ -87,7 +87,7 @@ const TRACKS: Track[] = [
     youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4",
     youtubeVideoId: "fAP2UOOGTn4",
     videoBadge: "Official Visualizer",
-    themeColor: "#c000ff"
+    themeColor: "#e0dcdc"
   },
   {
     id: "dejavu",
@@ -100,7 +100,7 @@ const TRACKS: Track[] = [
     youtubeUrl: "https://www.youtube.com/watch?v=TPwBpsgxirc",
     youtubeVideoId: "TPwBpsgxirc",
     videoBadge: "Official Music Video",
-    themeColor: "#00e676"
+    themeColor: "#8acf6e"
   },
   {
     id: "pasuktagalva",
@@ -113,7 +113,7 @@ const TRACKS: Track[] = [
     youtubeUrl: "https://www.youtube.com/watch?v=3SBb3v9r-J0",
     youtubeVideoId: "3SBb3v9r-J0",
     videoBadge: "Official Audio",
-    themeColor: "#e1ff00"
+    themeColor: "#8acf6e"
   }
 ];
 
@@ -235,6 +235,7 @@ export default function Home() {
   const displayTrack = isTrailerActive 
     ? (TRACKS.find(t => t.id === "pasuktagalva") || activeTrack)
     : activeTrack;
+  const activeThemeColor = isTrailerActive ? "#ff003c" : displayTrack.themeColor;
 
   // Helper to skip track automatically on end
   const autoSkipNext = () => {
@@ -409,7 +410,7 @@ export default function Home() {
   return (
     <div
       style={{
-        "--theme-color": displayTrack.themeColor,
+        "--theme-color": activeThemeColor,
       } as React.CSSProperties}
       className="relative min-h-screen bg-[#050505] text-[#f5f5f5] font-mono selection:bg-theme-accent selection:text-[#050505] overflow-x-hidden transition-colors duration-1000"
     >
@@ -418,7 +419,7 @@ export default function Home() {
       <div className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_4px,6px_100%]" />
 
       {/* --- HEADER --- */}
-      <header className="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-md border-b border-[#160a0b] px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-md border-b border-theme-accent/15 px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Left Status Label */}
         <div className="flex items-center gap-2 text-[9px] text-zinc-500 font-mono tracking-widest sm:w-1/4 justify-center sm:justify-start">
           <span className="relative flex h-1.5 w-1.5">
@@ -490,10 +491,10 @@ export default function Home() {
               ? "w-full lg:w-[25%] lg:mr-6 max-h-[1000px] lg:max-h-none opacity-100 scale-100 pointer-events-auto mt-0" 
               : "w-full lg:w-0 lg:mr-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none -mt-6 lg:mt-0"
           }`}>
-            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-6 h-full justify-center w-full lg:w-[270px] shrink-0">
+            <div className="border border-theme-accent/30 bg-[#0a0505] p-4 rounded-lg flex flex-col gap-6 h-full justify-center w-full lg:w-[270px] shrink-0">
               
               {/* Cover Display */}
-              <div className="relative aspect-square w-full max-w-[320px] lg:max-w-none mx-auto rounded border border-[#2a1316] overflow-hidden group shadow-[0_0_20px_rgba(255,0,60,0.12)]">
+              <div className="relative aspect-square w-full max-w-[320px] lg:max-w-none mx-auto rounded border border-theme-accent/30 overflow-hidden group shadow-cover-glow">
                 <Image
                   src={displayTrack.coverUrl}
                   alt={displayTrack.title}
@@ -571,12 +572,12 @@ export default function Home() {
               ? "w-full lg:w-[50%]" 
               : "w-full lg:w-[65%] max-w-4xl mx-auto"
           }`}>
-            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 h-full justify-between">
+            <div className="border border-theme-accent/30 bg-[#0a0505] p-4 rounded-lg flex flex-col gap-4 h-full justify-between">
               
               {/* Unified Video & Audio Side Controller Box */}
-              <div className="border border-[#281517] bg-[#0c0707] p-2 rounded-lg flex flex-row gap-3 items-stretch relative overflow-hidden group">
+              <div className="border border-theme-accent/40 bg-[#0c0707] p-2 rounded-lg flex flex-row gap-3 items-stretch relative overflow-hidden group">
                 {/* Target div for YouTube player loading */}
-                <div className="relative aspect-video flex-1 rounded overflow-hidden bg-black/80 border border-[#1b0d0e]">
+                <div className="relative aspect-video flex-1 rounded overflow-hidden bg-black/80 border border-theme-accent/20">
                     <div id="yt-player" className="w-full h-full border-0 grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
                 </div>
 
@@ -594,10 +595,10 @@ export default function Home() {
               <div className="flex flex-col gap-3 justify-between flex-1 mt-2">
                 
                 {/* Current Track Readout */}
-                <div className="flex flex-col gap-0.5 border-b border-[#1b0d0e] pb-2">
+                <div className="flex flex-col gap-0.5 border-b border-theme-accent/20 pb-2">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[8px] text-theme-accent font-mono tracking-widest uppercase">{"//"} NOW PLAYING</span>
-                    <span className="h-[1px] w-4 bg-[#2a1316]" />
+                    <span className="h-[1px] w-4 bg-theme-accent/30" />
                     <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL ARTIST TRAILER" : activeTrack.videoBadge}</span>
                   </div>
                   <h2 className="text-xl font-normal text-white uppercase font-sidewalk tracking-wide mt-0.5">
@@ -625,7 +626,7 @@ export default function Home() {
                     <button 
                       onClick={handlePrev}
                       aria-label="Previous track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
+                      className="p-1.5 border border-theme-accent/30 hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipBack size={12} />
                     </button>
@@ -641,7 +642,7 @@ export default function Home() {
                     <button 
                       onClick={handleNext}
                       aria-label="Next track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
+                      className="p-1.5 border border-theme-accent/30 hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipForward size={12} />
                     </button>
@@ -684,7 +685,7 @@ export default function Home() {
               ? "w-full lg:w-[25%] lg:ml-6 max-h-[1000px] lg:max-h-none opacity-100 scale-100 pointer-events-auto mt-0" 
               : "w-full lg:w-0 lg:ml-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none -mt-6 lg:mt-0"
           }`}>
-            <div className="border border-[#221012] bg-[#0a0505] p-4 rounded-lg flex flex-col h-full justify-between w-full lg:w-[270px] shrink-0">
+            <div className="border border-theme-accent/30 bg-[#0a0505] p-4 rounded-lg flex flex-col h-full justify-between w-full lg:w-[270px] shrink-0">
               
               <div className="flex flex-col flex-1 min-h-0">
                 <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-3 font-sans">{"//"} TRACKLIST</span>
@@ -699,7 +700,7 @@ export default function Home() {
                         className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent ${
                           isActive 
                             ? "bg-theme-accent/10 border-theme-accent/30 text-white" 
-                             : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
+                             : "bg-black/30 border-theme-accent/10 text-zinc-400 hover:border-theme-accent/40 hover:text-white"
                         }`}
                       >
                         <div className="flex items-center justify-between min-w-0">
@@ -744,12 +745,12 @@ export default function Home() {
         </div>
 
         {/* --- BIO SECTION --- */}
-        <section className="mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-[#1a1112] pt-12 reveal">
+        <section className="mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-theme-accent/15 pt-12 reveal">
           {/* Bio Text (7 Columns) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-2">
               <span className="text-theme-accent font-bold font-mono text-xs">{"//"} BIO</span>
-              <span className="h-[1px] w-12 bg-[#2a1316]" />
+              <span className="h-[1px] w-12 bg-theme-accent/30" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
               about digit
@@ -766,7 +767,7 @@ export default function Home() {
               </p>
             </div>
             {/* Quick Stats Panel */}
-            <div className="grid grid-cols-3 gap-4 border border-[#221012] bg-[#0a0505] p-4 rounded text-center font-mono">
+            <div className="grid grid-cols-3 gap-4 border border-theme-accent/20 bg-[#0a0505] p-4 rounded text-center font-mono">
               <div>
                 <div className="text-[10px] text-zinc-500 uppercase">origin</div>
                 <div className="text-xs text-white uppercase mt-0.5 font-bold">Lithuania</div>
@@ -786,7 +787,7 @@ export default function Home() {
               <a 
                 href="mailto:thedigitalwrld@gmail.com"
                 onClick={() => track("click_contact_email")}
-                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#3e1d21] hover:border-theme-accent text-white hover:text-white rounded bg-black/40 hover:bg-theme-accent/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-theme-accent/30 hover:border-theme-accent text-white hover:text-white rounded bg-black/40 hover:bg-theme-accent/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
               >
                 <svg className="w-3.5 h-3.5 text-theme-accent shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path>
@@ -834,10 +835,10 @@ export default function Home() {
         </section>
 
         {/* --- CONNECT / FOOTER PLATFORMS --- */}
-        <section className="mb-16 border-t border-[#1a1112] pt-12 reveal">
+        <section className="mb-16 border-t border-theme-accent/15 pt-12 reveal">
           <div className="flex items-center gap-2 mb-6">
             <span className="text-theme-accent font-bold font-mono text-xs">{"//"} STAY IN TOUCH</span>
-            <span className="h-[1px] w-12 bg-[#2a1316]" />
+            <span className="h-[1px] w-12 bg-theme-accent/30" />
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -848,7 +849,7 @@ export default function Home() {
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => track("click_platform_connect", { platform_name: platform.name })}
-                className={`border border-[#1f0f11] bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] ${platform.color}`}
+                className={`border border-theme-accent/15 bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] ${platform.color}`}
               >
                 <div>
                   <h4 className="text-sm font-bold uppercase tracking-wider mt-1 font-mono">{platform.name}</h4>
@@ -866,7 +867,7 @@ export default function Home() {
       </main>
 
       {/* --- FOOTER --- */}
-      <footer className="border-t border-[#1a1112] bg-[#050505] py-12 px-4 md:px-8 text-center text-[9px] text-zinc-600 font-mono reveal">
+      <footer className="border-t border-theme-accent/15 bg-[#050505] py-12 px-4 md:px-8 text-center text-[9px] text-zinc-600 font-mono reveal">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex gap-6 uppercase tracking-wider font-sans font-bold">
             <a 

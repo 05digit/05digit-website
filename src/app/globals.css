@@ -8,6 +8,13 @@
   font-display: swap;
 }
 
+/* Enable smooth transitions directly on the CSS custom property */
+@property --theme-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ff003c;
+}
+
 :root {
   --background: #050505;
   --foreground: #f5f5f5;
@@ -95,14 +102,35 @@ input[type="range"]::-moz-range-thumb:hover {
 /* Custom Shadow Utility Classes for Theme Accents */
 .shadow-theme-glow {
   box-shadow: 0 0 12px color-mix(in srgb, var(--theme-color) 40%, transparent) !important;
-  transition: box-shadow 0.3s ease;
 }
 
 .shadow-theme-border-glow {
   box-shadow: 0 0 10px color-mix(in srgb, var(--theme-color) 10%, transparent) !important;
-  transition: box-shadow 0.3s ease;
 }
 
 .shadow-theme-border-glow:hover {
   box-shadow: 0 0 15px color-mix(in srgb, var(--theme-color) 25%, transparent) !important;
+}
+
+.shadow-cover-glow {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--theme-color) 12%, transparent) !important;
+}
+
+/* Smooth automatic color-fade transitions for elements using theme colors */
+.text-theme-accent,
+.bg-theme-accent,
+.border-theme-accent,
+.shadow-theme-glow,
+.shadow-theme-border-glow,
+.shadow-cover-glow,
+input[type="range"]::-webkit-slider-thumb,
+input[type="range"]::-moz-range-thumb,
+.logo-glow {
+  transition: color 1s ease-in-out, border-color 1s ease-in-out, background-color 1s ease-in-out, box-shadow 1s ease-in-out, filter 1s ease-in-out, transform 0.1s ease;
+}
+
+/* Apply transition to opacity-modified border and background variants */
+[class*="border-theme-accent/"],
+[class*="bg-theme-accent/"] {
+  transition: border-color 1s ease-in-out, background-color 1s ease-in-out;
 }
