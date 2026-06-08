@@ -410,7 +410,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_spotify")}
-            className="hover:text-[#1db954] hover:border-[#1db954] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
+            className="hover:text-[#1db954] hover:border-[#1db954] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1db954] rounded-sm"
           >
             SPOTIFY
           </a>
@@ -419,7 +419,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_apple")}
-            className="hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
+            className="hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fc3c44] rounded-sm"
           >
             APPLE
           </a>
@@ -428,7 +428,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_youtube")}
-            className="hover:text-[#ff0000] hover:border-[#ff0000] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
+            className="hover:text-[#ff0000] hover:border-[#ff0000] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff0000] rounded-sm"
           >
             YOUTUBE
           </a>
@@ -437,7 +437,7 @@ export default function Home() {
             target="_blank" 
             rel="noreferrer" 
             onClick={() => track("click_header_instagram")}
-            className="hover:text-[#e1306c] hover:border-[#e1306c] transition-all duration-300 pb-0.5 border-b border-solid border-transparent"
+            className="hover:text-[#e1306c] hover:border-[#e1306c] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e1306c] rounded-sm"
           >
             INSTAGRAM
           </a>
@@ -450,7 +450,9 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-0 mb-16 items-stretch justify-center w-full min-h-[480px]">
           
           {/* COLUMN 1: COVER ART & LINKS */}
-          <div className={`transition-all duration-700 ease-in-out origin-right flex flex-col items-end max-w-md mx-auto lg:max-w-none relative ${
+          <div
+            id="deck-left-cover"
+            className={`transition-all duration-700 ease-in-out origin-right flex flex-col items-end max-w-md mx-auto lg:max-w-none relative ${
             isExpanded 
               ? "w-full lg:w-[25%] lg:mr-6 max-h-[1000px] lg:max-h-none opacity-100 scale-100 pointer-events-auto mt-0" 
               : "w-full lg:w-0 lg:mr-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none -mt-6 lg:mt-0"
@@ -485,7 +487,7 @@ export default function Home() {
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => track("click_track_spotify", { track_title: displayTrack.title })}
-                    className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                    className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1db954]"
                   >
                     <span>SPOTIFY</span>
                   </a>
@@ -501,7 +503,7 @@ export default function Home() {
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => track("click_track_apple", { track_title: displayTrack.title })}
-                    className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                    className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fc3c44]"
                   >
                     <span>APPLE</span>
                   </a>
@@ -517,7 +519,7 @@ export default function Home() {
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => track("click_track_youtube", { track_title: displayTrack.title })}
-                    className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center"
+                    className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff0000]"
                   >
                     <span>YOUTUBE</span>
                   </a>
@@ -590,7 +592,7 @@ export default function Home() {
                     <button 
                       onClick={handlePrev}
                       aria-label="Previous track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
                     >
                       <SkipBack size={12} />
                     </button>
@@ -606,7 +608,7 @@ export default function Home() {
                     <button 
                       onClick={handleNext}
                       aria-label="Next track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer"
+                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
                     >
                       <SkipForward size={12} />
                     </button>
@@ -616,7 +618,7 @@ export default function Home() {
                   {!isTrailerActive && (
                     <button
                       onClick={handleToggleTrailer}
-                      className="px-4 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white transition-all duration-300 active:scale-95 cursor-pointer w-full sm:w-auto"
+                      className="px-4 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white transition-all duration-300 active:scale-95 cursor-pointer w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
                     >
                       WATCH TRAILER
                     </button>
@@ -628,7 +630,9 @@ export default function Home() {
                 <div className="transition-all duration-700 ease-in-out w-full mt-1">
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="w-full py-2 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)]"
+                    aria-expanded={isExpanded}
+                    aria-controls="deck-left-cover deck-right-tracklist"
+                    className="w-full py-2 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
                   >
                     {isExpanded ? "COLLAPSE" : "MORE MUSIC"}
                   </button>
@@ -640,7 +644,9 @@ export default function Home() {
           </div>
 
           {/* COLUMN 3: TRACKLIST */}
-          <div className={`transition-all duration-700 ease-in-out origin-left flex flex-col items-start max-w-md mx-auto lg:max-w-none relative ${
+          <div
+            id="deck-right-tracklist"
+            className={`transition-all duration-700 ease-in-out origin-left flex flex-col items-start max-w-md mx-auto lg:max-w-none relative ${
             isExpanded 
               ? "w-full lg:w-[25%] lg:ml-6 max-h-[1000px] lg:max-h-none opacity-100 scale-100 pointer-events-auto mt-0" 
               : "w-full lg:w-0 lg:ml-0 max-h-0 lg:max-h-none opacity-0 scale-95 overflow-hidden pointer-events-none -mt-6 lg:mt-0"
@@ -747,7 +753,7 @@ export default function Home() {
               <a 
                 href="mailto:thedigitalwrld@gmail.com"
                 onClick={() => track("click_contact_email")}
-                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#3e1d21] hover:border-[#ff003c] text-white hover:text-white rounded bg-black/40 hover:bg-[#ff003c]/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#3e1d21] hover:border-[#ff003c] text-white hover:text-white rounded bg-black/40 hover:bg-[#ff003c]/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
               >
                 <svg className="w-3.5 h-3.5 text-[#ff003c] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path>
