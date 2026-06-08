@@ -129,11 +129,11 @@ export function VolumeSlider({
           setIsVideoMuted(nextMute);
           track("click_video_mute_toggle", { muted: nextMute });
         }}
-        className="bg-black/90 hover:bg-[#ff003c] text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
+        className="bg-black/90 hover:bg-theme-accent text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
         aria-label={isVideoMuted ? "Unmute" : "Mute"}
       >
         {isVideoMuted ? (
-          <VolumeX size={12} className="text-[#ff003c]" />
+          <VolumeX size={12} className="text-theme-accent" />
         ) : (
           <Volume2 size={12} />
         )}
@@ -171,17 +171,17 @@ export function VolumeSlider({
             onVolumeChangeCommit(newVolume);
           }
         }}
-        className="flex-1 w-full flex items-center justify-center cursor-pointer relative py-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] focus-visible:rounded"
+        className="flex-1 w-full flex items-center justify-center cursor-pointer relative py-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:rounded"
       >
         {/* Track Background */}
         <div className="w-1 h-full bg-[#1a0e10] rounded-full relative flex flex-col justify-end">
           {/* Active Fill Track */}
           <div
-            className="w-full bg-[#ff003c] rounded-full relative"
+            className="w-full bg-theme-accent rounded-full relative"
             style={{ height: `${displayVolume * 100}%` }}
           >
             {/* Glow Handle/Thumb */}
-            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#ff003c] border border-white/20 rounded-full shadow-[0_0_8px_#ff003c] hover:scale-125 transition-transform duration-100" />
+            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-theme-accent border border-white/20 rounded-full shadow-[0_0_8px_var(--theme-color)] hover:scale-125 transition-transform duration-100" />
           </div>
         </div>
       </div>

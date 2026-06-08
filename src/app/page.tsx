@@ -31,6 +31,7 @@ interface Track {
   youtubeUrl?: string;
   youtubeVideoId: string;
   videoBadge: string;
+  themeColor: string;
 }
 
 const TRACKS: Track[] = [
@@ -44,7 +45,8 @@ const TRACKS: Track[] = [
     appleMusicUrl: "https://music.apple.com/lt/album/primityva/6769248612?i=6769248795",
     youtubeUrl: "https://www.youtube.com/watch?v=nNoiPOPh9j8",
     youtubeVideoId: "nNoiPOPh9j8",
-    videoBadge: "Official Visualizer"
+    videoBadge: "Official Visualizer",
+    themeColor: "#ff003c"
   },
   {
     id: "nebeskambink",
@@ -57,7 +59,8 @@ const TRACKS: Track[] = [
     appleMusicUrl: "https://music.apple.com/us/album/nebeskambink/1810770309?i=1810770311",
     youtubeUrl: "https://www.youtube.com/watch?v=aX0aSpsqEy8",
     youtubeVideoId: "aX0aSpsqEy8",
-    videoBadge: "Official Music Video"
+    videoBadge: "Official Music Video",
+    themeColor: "#00d2ff"
   },
   {
     id: "apakau",
@@ -70,7 +73,8 @@ const TRACKS: Track[] = [
     appleMusicUrl: "https://music.apple.com/us/album/apakau/1804514772?i=1804514773",
     youtubeUrl: "https://www.youtube.com/watch?v=FRqvZ1aif4c",
     youtubeVideoId: "FRqvZ1aif4c",
-    videoBadge: "Official Visualizer"
+    videoBadge: "Official Visualizer",
+    themeColor: "#ffaa00"
   },
   {
     id: "perfect",
@@ -82,7 +86,8 @@ const TRACKS: Track[] = [
     appleMusicUrl: "https://music.apple.com/us/album/perfect/1804514772?i=1804514778",
     youtubeUrl: "https://www.youtube.com/watch?v=fAP2UOOGTn4",
     youtubeVideoId: "fAP2UOOGTn4",
-    videoBadge: "Official Visualizer"
+    videoBadge: "Official Visualizer",
+    themeColor: "#c000ff"
   },
   {
     id: "dejavu",
@@ -94,7 +99,8 @@ const TRACKS: Track[] = [
     appleMusicUrl: "https://music.apple.com/lt/album/deja-vu/1804513622?i=1804513630",
     youtubeUrl: "https://www.youtube.com/watch?v=TPwBpsgxirc",
     youtubeVideoId: "TPwBpsgxirc",
-    videoBadge: "Official Music Video"
+    videoBadge: "Official Music Video",
+    themeColor: "#00e676"
   },
   {
     id: "pasuktagalva",
@@ -106,7 +112,8 @@ const TRACKS: Track[] = [
     appleMusicUrl: "https://music.apple.com/us/album/pasukta-galva/1804513622?i=1804513623",
     youtubeUrl: "https://www.youtube.com/watch?v=3SBb3v9r-J0",
     youtubeVideoId: "3SBb3v9r-J0",
-    videoBadge: "Official Audio"
+    videoBadge: "Official Audio",
+    themeColor: "#e1ff00"
   }
 ];
 
@@ -132,8 +139,8 @@ const PLATFORMS = [
   {
     name: "YouTube Music",
     url: "https://music.youtube.com/@05digit",
-    color: "hover:bg-[#ff003c]/10 hover:border-[#ff003c] hover:text-[#ff003c]",
-    accent: "#ff003c"
+    color: "hover:bg-theme-accent/10 hover:border-theme-accent hover:text-theme-accent",
+    accent: "var(--theme-color)"
   },
   {
     name: "Instagram",
@@ -200,6 +207,27 @@ export default function Home() {
       if (totalElapsedSeconds > 2) {
         track("session_end", { total_seconds: totalElapsedSeconds });
       }
+    };
+  }, []);
+
+  // Intersection Observer for scroll-reveal animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const revealElements = document.querySelectorAll(".reveal");
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      revealElements.forEach((el) => observer.unobserve(el));
     };
   }, []);
 
@@ -379,7 +407,12 @@ export default function Home() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="relative min-h-screen bg-[#050505] text-[#f5f5f5] font-mono selection:bg-[#ff003c] selection:text-[#050505] overflow-x-hidden">
+    <div
+      style={{
+        "--theme-color": displayTrack.themeColor,
+      } as React.CSSProperties}
+      className="relative min-h-screen bg-[#050505] text-[#f5f5f5] font-mono selection:bg-theme-accent selection:text-[#050505] overflow-x-hidden transition-colors duration-1000"
+    >
       {/* Glitch CRT Overlay */}
       <div className="pointer-events-none fixed inset-0 z-50 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0)_20%,rgba(0,0,0,0.65)_100%)]" />
       <div className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_4px,6px_100%]" />
@@ -389,8 +422,8 @@ export default function Home() {
         {/* Left Status Label */}
         <div className="flex items-center gap-2 text-[9px] text-zinc-500 font-mono tracking-widest sm:w-1/4 justify-center sm:justify-start">
           <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff003c] opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#ff003c]" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-theme-accent opacity-75" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-theme-accent" />
           </span>
           <span>05_ONLINE</span>
         </div>
@@ -563,7 +596,7 @@ export default function Home() {
                 {/* Current Track Readout */}
                 <div className="flex flex-col gap-0.5 border-b border-[#1b0d0e] pb-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[8px] text-[#ff003c] font-mono tracking-widest uppercase">{"//"} NOW PLAYING</span>
+                    <span className="text-[8px] text-theme-accent font-mono tracking-widest uppercase">{"//"} NOW PLAYING</span>
                     <span className="h-[1px] w-4 bg-[#2a1316]" />
                     <span className="text-[8px] text-zinc-500 font-mono tracking-widest uppercase">{isTrailerActive ? "OFFICIAL ARTIST TRAILER" : activeTrack.videoBadge}</span>
                   </div>
@@ -576,9 +609,9 @@ export default function Home() {
                     )}
                   </h2>
                   {isTrailerActive && (
-                    <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-1 uppercase">
-                      Background Track: <span className="text-[#ff003c] font-bold">Pasukta galva</span>
-                    </p>
+                     <p className="text-[9px] text-zinc-400 font-mono tracking-widest mt-1 uppercase">
+                       Background Track: <span className="text-theme-accent font-bold">Pasukta galva</span>
+                     </p>
                   )}
                 </div>
 
@@ -592,7 +625,7 @@ export default function Home() {
                     <button 
                       onClick={handlePrev}
                       aria-label="Previous track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
+                      className="p-1.5 border border-[#3e1d21] hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipBack size={12} />
                     </button>
@@ -600,7 +633,7 @@ export default function Home() {
                     <button 
                       onClick={handlePlayPause}
                       aria-label={isPlaying ? "Pause track" : "Play track"}
-                      className="px-5 py-1.5 bg-[#ff003c] hover:bg-[#ff1e51] text-black rounded font-bold text-[8px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(255,0,60,0.35)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
+                      className="px-5 py-1.5 bg-theme-accent hover:opacity-85 text-black rounded font-bold text-[8px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-theme-glow cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
                     >
                       {isPlaying ? "PAUSE" : "PLAY"}
                     </button>
@@ -608,7 +641,7 @@ export default function Home() {
                     <button 
                       onClick={handleNext}
                       aria-label="Next track"
-                      className="p-1.5 border border-[#3e1d21] hover:border-[#ff003c] hover:text-[#ff003c] rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
+                      className="p-1.5 border border-[#3e1d21] hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipForward size={12} />
                     </button>
@@ -618,7 +651,7 @@ export default function Home() {
                   {!isTrailerActive && (
                     <button
                       onClick={handleToggleTrailer}
-                      className="px-4 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border bg-black/85 text-zinc-400 border-zinc-800 hover:border-[#ff003c] hover:text-white transition-all duration-300 active:scale-95 cursor-pointer w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
+                      className="px-4 py-1.5 rounded text-[8px] font-mono font-bold tracking-widest border bg-black/85 text-zinc-400 border-zinc-800 hover:border-theme-accent hover:text-white transition-all duration-300 active:scale-95 cursor-pointer w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       WATCH TRAILER
                     </button>
@@ -632,7 +665,7 @@ export default function Home() {
                     onClick={() => setIsExpanded(!isExpanded)}
                     aria-expanded={isExpanded}
                     aria-controls="deck-left-cover deck-right-tracklist"
-                    className="w-full py-2 bg-transparent border border-[#ff003c]/40 hover:border-[#ff003c] text-[#ff003c] hover:bg-[#ff003c]/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(255,0,60,0.1)] hover:shadow-[0_0_15px_rgba(255,0,60,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
+                    className="w-full py-2 bg-transparent border border-theme-accent/40 hover:border-theme-accent text-theme-accent hover:bg-theme-accent/10 rounded font-mono font-bold text-[8px] uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-theme-border-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                   >
                     {isExpanded ? "COLLAPSE" : "MORE MUSIC"}
                   </button>
@@ -663,28 +696,28 @@ export default function Home() {
                         key={t.id}
                         onClick={() => selectTrack(index)}
                         aria-current={isActive ? "true" : undefined}
-                        className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c] ${
+                        className={`w-full flex flex-col p-2.5 rounded transition-all text-left cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent ${
                           isActive 
-                            ? "bg-[#ff003c]/10 border-[#ff003c]/30 text-white" 
-                            : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
+                            ? "bg-theme-accent/10 border-theme-accent/30 text-white" 
+                             : "bg-black/30 border-[#1b0d0e] text-zinc-400 hover:border-[#3e1d21] hover:text-white"
                         }`}
                       >
                         <div className="flex items-center justify-between min-w-0">
                           <div className="flex items-center gap-2 min-w-0">
-                            <span className={`text-[8px] font-mono ${isActive ? "text-[#ff003c]" : "text-zinc-600"} shrink-0`}>
-                              {String(index + 1).padStart(2, "0")}
+                            <span className={`text-[8px] font-mono ${isActive ? "text-theme-accent" : "text-zinc-600"} shrink-0`}>
+                               {String(index + 1).padStart(2, "0")}
                             </span>
-                            <span className={`font-sidewalk text-sm tracking-wide truncate ${isActive ? "text-[#ff003c]" : "text-zinc-200"}`}>
-                              {t.title}
+                            <span className={`font-sidewalk text-sm tracking-wide truncate ${isActive ? "text-theme-accent" : "text-zinc-200"}`}>
+                               {t.title}
                             </span>
                           </div>
-                          
-                          {isActive && isPlaying ? (
-                            <div className="flex items-end gap-0.5 h-2 w-3.5 justify-end shrink-0">
-                              <span className="w-0.5 h-full bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.2s]" />
-                              <span className="w-0.5 h-2/3 bg-[#ff003c] animate-[bounce_0.8s_infinite_-0.4s]" />
-                              <span className="w-0.5 h-4/5 bg-[#ff003c] animate-[bounce_0.8s_infinite_0s]" />
-                            </div>
+                           
+                           {isActive && isPlaying ? (
+                             <div className="flex items-end gap-0.5 h-2 w-3.5 justify-end shrink-0">
+                               <span className="w-0.5 h-full bg-theme-accent animate-[bounce_0.8s_infinite_-0.2s]" />
+                               <span className="w-0.5 h-2/3 bg-theme-accent animate-[bounce_0.8s_infinite_-0.4s]" />
+                               <span className="w-0.5 h-4/5 bg-theme-accent animate-[bounce_0.8s_infinite_0s]" />
+                             </div>
                           ) : (
                             <span className="text-[8px] text-zinc-500 font-mono shrink-0">{t.duration}</span>
                           )}
@@ -711,11 +744,11 @@ export default function Home() {
         </div>
 
         {/* --- BIO SECTION --- */}
-        <section className="mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-[#1a1112] pt-12">
+        <section className="mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-[#1a1112] pt-12 reveal">
           {/* Bio Text (7 Columns) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-2">
-              <span className="text-[#ff003c] font-bold font-mono text-xs">{"//"} BIO</span>
+              <span className="text-theme-accent font-bold font-mono text-xs">{"//"} BIO</span>
               <span className="h-[1px] w-12 bg-[#2a1316]" />
             </div>
             <h2 className="text-3xl font-normal tracking-widest text-[#f5f5f5] font-sidewalk uppercase">
@@ -744,7 +777,7 @@ export default function Home() {
               </div>
               <div>
                 <div className="text-[10px] text-zinc-500 uppercase">genre</div>
-                <div className="text-xs text-[#ff003c] mt-0.5 font-bold uppercase truncate">hip-hop / undefined</div>
+                <div className="text-xs text-theme-accent mt-0.5 font-bold uppercase truncate">hip-hop / undefined</div>
               </div>
             </div>
 
@@ -753,9 +786,9 @@ export default function Home() {
               <a 
                 href="mailto:thedigitalwrld@gmail.com"
                 onClick={() => track("click_contact_email")}
-                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#3e1d21] hover:border-[#ff003c] text-white hover:text-white rounded bg-black/40 hover:bg-[#ff003c]/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff003c]"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#3e1d21] hover:border-theme-accent text-white hover:text-white rounded bg-black/40 hover:bg-theme-accent/10 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
               >
-                <svg className="w-3.5 h-3.5 text-[#ff003c] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-theme-accent shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path>
                 </svg>
                 work with digit // contact
@@ -766,7 +799,7 @@ export default function Home() {
           {/* Bio Photo Collage (5 Columns) */}
           <div className="lg:col-span-5 grid grid-cols-2 gap-3 relative h-[380px] sm:h-[450px]">
             {/* Photo 1 (Left Column - Spans full height - Portrait format fits profile.JPG perfectly) */}
-            <div className="relative rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700 h-full">
+            <div className="relative rounded overflow-hidden border border-zinc-900 hover:border-theme-accent transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700 h-full">
               <Image
                 src="/photos/profile.JPG"
                 alt="Digit portrait profile"
@@ -778,7 +811,7 @@ export default function Home() {
 
             {/* Right Column Stack (Two shorter landscape slots fit red.JPG and hero2.jpg perfectly) */}
             <div className="flex flex-col gap-3 h-full">
-              <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
+              <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-theme-accent transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
                 <Image
                   src="/photos/red.JPG"
                   alt="Digit red portrait landscape"
@@ -787,7 +820,7 @@ export default function Home() {
                   sizes="(max-width: 1024px) 25vw, 15vw"
                 />
               </div>
-              <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-[#ff003c] transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
+              <div className="relative flex-1 rounded overflow-hidden border border-zinc-900 hover:border-theme-accent transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.8)] filter grayscale hover:grayscale-0 transition-all duration-700">
                 <Image
                   src="/photos/hero2.jpg"
                   alt="Digit live performance landscape"
@@ -801,9 +834,9 @@ export default function Home() {
         </section>
 
         {/* --- CONNECT / FOOTER PLATFORMS --- */}
-        <section className="mb-16 border-t border-[#1a1112] pt-12">
+        <section className="mb-16 border-t border-[#1a1112] pt-12 reveal">
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-[#ff003c] font-bold font-mono text-xs">{"//"} STAY IN TOUCH</span>
+            <span className="text-theme-accent font-bold font-mono text-xs">{"//"} STAY IN TOUCH</span>
             <span className="h-[1px] w-12 bg-[#2a1316]" />
           </div>
           
@@ -833,7 +866,7 @@ export default function Home() {
       </main>
 
       {/* --- FOOTER --- */}
-      <footer className="border-t border-[#1a1112] bg-[#050505] py-12 px-4 md:px-8 text-center text-[9px] text-zinc-600 font-mono">
+      <footer className="border-t border-[#1a1112] bg-[#050505] py-12 px-4 md:px-8 text-center text-[9px] text-zinc-600 font-mono reveal">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex gap-6 uppercase tracking-wider font-sans font-bold">
             <a 
@@ -841,7 +874,7 @@ export default function Home() {
               target="_blank" 
               rel="noreferrer" 
               onClick={() => track("click_footer_instagram")}
-              className="hover:text-[#ff003c] transition-colors"
+              className="hover:text-theme-accent transition-colors"
             >
               Instagram
             </a>
@@ -850,7 +883,7 @@ export default function Home() {
               target="_blank" 
               rel="noreferrer" 
               onClick={() => track("click_footer_spotify")}
-              className="hover:text-[#ff003c] transition-colors"
+              className="hover:text-theme-accent transition-colors"
             >
               Spotify
             </a>
@@ -859,7 +892,7 @@ export default function Home() {
               target="_blank" 
               rel="noreferrer" 
               onClick={() => track("click_footer_youtube")}
-              className="hover:text-[#ff003c] transition-colors"
+              className="hover:text-theme-accent transition-colors"
             >
               YouTube
             </a>
