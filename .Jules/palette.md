@@ -5,3 +5,7 @@
 ## 2025-02-12 - Associating Expanding Regions
 **Learning:** For visually complex UI elements like the "Deck" layout, where a single toggle button ("MORE MUSIC" / "COLLAPSE") opens multiple non-contiguous expanding regions (Left column, Right column), `aria-controls` works perfectly by accepting a space-separated list of element IDs (e.g., `aria-controls="deck-left-cover deck-right-tracklist"`). Combining this with `aria-expanded` and explicit `focus-visible` styling ensures a cohesive accessibility experience regardless of layout complexity.
 **Action:** When creating a single toggle that affects multiple expanding elements across a page, always add unique `id`s to those expanding containers and supply them as a space-separated list to the toggle's `aria-controls` attribute, along with the standard `aria-expanded`.
+
+## 2026-06-09 - Pseudo-Interactive Elements
+**Learning:** Visual-only elements styled to look interactive (e.g., a `<span>` with `cursor-pointer` and hover effects) are completely invisible to keyboard users and screen readers unless explicitly managed with `tabIndex`, keyboard event listeners, and ARIA roles. This creates a severe accessibility barrier where sighted mouse users have features that keyboard/assistive tech users cannot access.
+**Action:** Never use non-interactive elements (like `<span>` or `<div>`) for clickable actions or links. Always convert them to proper semantic elements (like `<button>` or `<a>`) to inherit native keyboard focus and interaction behavior for free, and ensure they have appropriate focus visible styles.

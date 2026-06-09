@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { SkipForward, SkipBack } from "lucide-react";
 import { VolumeSlider } from "@/components/VolumeSlider";
+import Link from "next/link";
 import { track } from "@vercel/analytics";
 
 // Minimal type for the YouTube IFrame API player
@@ -432,9 +433,13 @@ export default function Home() {
         {/* Centered Logo */}
         <div className="flex justify-center items-center sm:w-2/4 flex-col">
           <h1 className="sr-only">05digit / digit / 05 Official Artist Website</h1>
-          <span className="inline-block text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase cursor-pointer logo-glow">
+          <Link
+            href="/"
+            aria-label="Home"
+            className="inline-block text-3xl md:text-4xl font-normal text-[#f5f5f5] font-sidewalk tracking-widest lowercase cursor-pointer logo-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#050505] rounded-sm"
+          >
             digit
-          </span>
+          </Link>
         </div>
 
         {/* Right Social Redirect Matrix (Vibrant / Clean) */}
@@ -849,7 +854,7 @@ export default function Home() {
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => track("click_platform_connect", { platform_name: platform.name })}
-                className={`border border-theme-accent/15 bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] ${platform.color}`}
+                className={`border border-theme-accent/15 bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black ${platform.color}`}
               >
                 <div>
                   <h4 className="text-sm font-bold uppercase tracking-wider mt-1 font-mono">{platform.name}</h4>
@@ -875,7 +880,7 @@ export default function Home() {
               target="_blank" 
               rel="noreferrer" 
               onClick={() => track("click_footer_instagram")}
-              className="hover:text-theme-accent transition-colors"
+              className="hover:text-theme-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#050505] rounded-sm"
             >
               Instagram
             </a>
@@ -884,7 +889,7 @@ export default function Home() {
               target="_blank" 
               rel="noreferrer" 
               onClick={() => track("click_footer_spotify")}
-              className="hover:text-theme-accent transition-colors"
+              className="hover:text-theme-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#050505] rounded-sm"
             >
               Spotify
             </a>
@@ -893,7 +898,7 @@ export default function Home() {
               target="_blank" 
               rel="noreferrer" 
               onClick={() => track("click_footer_youtube")}
-              className="hover:text-theme-accent transition-colors"
+              className="hover:text-theme-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#050505] rounded-sm"
             >
               YouTube
             </a>
