@@ -631,6 +631,7 @@ export default function Home() {
                     <button 
                       onClick={handlePrev}
                       aria-label="Previous track"
+                      title="Previous track"
                       className="p-1.5 border border-theme-accent/30 hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipBack size={12} />
@@ -639,6 +640,7 @@ export default function Home() {
                     <button 
                       onClick={handlePlayPause}
                       aria-label={isPlaying ? "Pause track" : "Play track"}
+                      title={isPlaying ? "Pause track" : "Play track"}
                       className="px-5 py-1.5 bg-theme-accent hover:opacity-85 text-black rounded font-bold text-[8px] uppercase tracking-widest transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-theme-glow cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0505]"
                     >
                       {isPlaying ? "PAUSE" : "PLAY"}
@@ -647,6 +649,7 @@ export default function Home() {
                     <button 
                       onClick={handleNext}
                       aria-label="Next track"
+                      title="Next track"
                       className="p-1.5 border border-theme-accent/30 hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipForward size={12} />
