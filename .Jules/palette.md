@@ -9,3 +9,6 @@
 ## 2026-06-09 - Pseudo-Interactive Elements
 **Learning:** Visual-only elements styled to look interactive (e.g., a `<span>` with `cursor-pointer` and hover effects) are completely invisible to keyboard users and screen readers unless explicitly managed with `tabIndex`, keyboard event listeners, and ARIA roles. This creates a severe accessibility barrier where sighted mouse users have features that keyboard/assistive tech users cannot access.
 **Action:** Never use non-interactive elements (like `<span>` or `<div>`) for clickable actions or links. Always convert them to proper semantic elements (like `<button>` or `<a>`) to inherit native keyboard focus and interaction behavior for free, and ensure they have appropriate focus visible styles.
+## 2024-05-18 - [Icon-Only Playback Buttons Tooltips]
+**Learning:** Found that custom media controls using `lucide-react` icons were missing visible tooltips for sighted users who might not recognize the specific icon shape for 'Skip Forward' or 'Skip Back', while they did have `aria-label` for screen readers.
+**Action:** Always pair `aria-label` with the native `title` attribute on icon-only buttons so both sighted users (via tooltip) and non-sighted users (via screen reader) receive the context.
