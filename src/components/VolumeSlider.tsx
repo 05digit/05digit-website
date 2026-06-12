@@ -131,6 +131,7 @@ export function VolumeSlider({
         }}
         className="bg-black/90 hover:bg-theme-accent text-white border border-[#3e1d21] p-1.5 rounded-full transition-all duration-300 active:scale-95 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
         aria-label={isVideoMuted ? "Unmute" : "Mute"}
+        title={isVideoMuted ? "Unmute" : "Mute"}
       >
         {isVideoMuted ? (
           <VolumeX size={12} className="text-theme-accent" />
@@ -144,9 +145,11 @@ export function VolumeSlider({
         ref={volumeBarRef}
         role="slider"
         aria-label="Volume"
+        aria-orientation="vertical"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(displayVolume * 100)}
+        aria-valuetext={`${Math.round(displayVolume * 100)}%`}
         tabIndex={0}
         onClick={handleVolumeClick}
         onMouseDown={(e) => {
