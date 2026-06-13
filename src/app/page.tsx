@@ -631,6 +631,7 @@ export default function Home() {
                     <button 
                       onClick={handlePrev}
                       aria-label="Previous track"
+                      title="Previous track"
                       className="p-1.5 border border-theme-accent/30 hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipBack size={12} />
@@ -647,6 +648,7 @@ export default function Home() {
                     <button 
                       onClick={handleNext}
                       aria-label="Next track"
+                      title="Next track"
                       className="p-1.5 border border-theme-accent/30 hover:border-theme-accent hover:text-theme-accent rounded text-white bg-black/40 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent"
                     >
                       <SkipForward size={12} />
