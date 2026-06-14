@@ -448,6 +448,8 @@ export default function Home() {
             href="https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw" 
             target="_blank" 
             rel="noreferrer" 
+            aria-label="05digit Spotify Profile (opens in new tab)"
+            title="05digit Spotify Profile"
             onClick={() => track("click_header_spotify")}
             className="hover:text-[#1db954] hover:border-[#1db954] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1db954] rounded-sm"
           >
@@ -457,6 +459,8 @@ export default function Home() {
             href="https://music.apple.com/us/artist/digit/1524901037" 
             target="_blank" 
             rel="noreferrer" 
+            aria-label="05digit Apple Music Profile (opens in new tab)"
+            title="05digit Apple Music Profile"
             onClick={() => track("click_header_apple")}
             className="hover:text-[#fc3c44] hover:border-[#fc3c44] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fc3c44] rounded-sm"
           >
@@ -466,6 +470,8 @@ export default function Home() {
             href="https://www.youtube.com/@05digit" 
             target="_blank" 
             rel="noreferrer" 
+            aria-label="05digit YouTube Channel (opens in new tab)"
+            title="05digit YouTube Channel"
             onClick={() => track("click_header_youtube")}
             className="hover:text-[#ff0000] hover:border-[#ff0000] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff0000] rounded-sm"
           >
@@ -475,6 +481,8 @@ export default function Home() {
             href="https://www.instagram.com/05digit/" 
             target="_blank" 
             rel="noreferrer" 
+            aria-label="05digit Instagram Profile (opens in new tab)"
+            title="05digit Instagram Profile"
             onClick={() => track("click_header_instagram")}
             className="hover:text-[#e1306c] hover:border-[#e1306c] transition-all duration-300 pb-0.5 border-b border-solid border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e1306c] rounded-sm"
           >
@@ -525,6 +533,8 @@ export default function Home() {
                     href={displayTrack.spotifyUrl}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label={`Listen to ${displayTrack.title} on Spotify (opens in new tab)`}
+                    title={`Listen to ${displayTrack.title} on Spotify`}
                     onClick={() => track("click_track_spotify", { track_title: displayTrack.title })}
                     className="flex flex-col items-center justify-center py-2 rounded border border-[#1db954]/30 bg-[#1db954]/5 text-[#1db954] hover:bg-[#1db954]/10 hover:border-[#1db954] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1db954]"
                   >
@@ -541,6 +551,8 @@ export default function Home() {
                     href={displayTrack.appleMusicUrl}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label={`Listen to ${displayTrack.title} on Apple Music (opens in new tab)`}
+                    title={`Listen to ${displayTrack.title} on Apple Music`}
                     onClick={() => track("click_track_apple", { track_title: displayTrack.title })}
                     className="flex flex-col items-center justify-center py-2 rounded border border-[#fc3c44]/30 bg-[#fc3c44]/5 text-[#fc3c44] hover:bg-[#fc3c44]/10 hover:border-[#fc3c44] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fc3c44]"
                   >
@@ -557,6 +569,8 @@ export default function Home() {
                     href={displayTrack.youtubeUrl}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label={`Listen to ${displayTrack.title} on YouTube (opens in new tab)`}
+                    title={`Listen to ${displayTrack.title} on YouTube`}
                     onClick={() => track("click_track_youtube", { track_title: displayTrack.title })}
                     className="flex flex-col items-center justify-center py-2 rounded border border-[#ff0000]/30 bg-[#ff0000]/5 text-[#ff0000] hover:bg-[#ff0000]/10 hover:border-[#ff0000] transition-all duration-300 font-mono text-[9px] font-bold tracking-widest text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff0000]"
                   >
@@ -855,6 +869,8 @@ export default function Home() {
                 href={platform.url}
                 target="_blank"
                 rel="noreferrer"
+                aria-label={`05digit ${platform.name} Profile (opens in new tab)`}
+                title={`05digit ${platform.name} Profile`}
                 onClick={() => track("click_platform_connect", { platform_name: platform.name })}
                 className={`border border-theme-accent/15 bg-[#080404] p-5 rounded-lg flex flex-col justify-between transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black ${platform.color}`}
               >
@@ -862,7 +878,7 @@ export default function Home() {
                   <h4 className="text-sm font-bold uppercase tracking-wider mt-1 font-mono">{platform.name}</h4>
                 </div>
                 <div className="flex justify-end mt-6">
-                  <svg className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"></path>
                   </svg>
                 </div>
@@ -881,6 +897,8 @@ export default function Home() {
               href="https://instagram.com/05digit" 
               target="_blank" 
               rel="noreferrer" 
+              aria-label="05digit Instagram Profile (opens in new tab)"
+              title="05digit Instagram Profile"
               onClick={() => track("click_footer_instagram")}
               className="hover:text-theme-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#050505] rounded-sm"
             >
@@ -890,6 +908,8 @@ export default function Home() {
               href="https://open.spotify.com/artist/33z8eBD0nviVNHjKoe6kZZ?si=KBRyTTXrQoSX06e2hIlyxw" 
               target="_blank" 
               rel="noreferrer" 
+              aria-label="05digit Spotify Profile (opens in new tab)"
+              title="05digit Spotify Profile"
               onClick={() => track("click_footer_spotify")}
               className="hover:text-theme-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#050505] rounded-sm"
             >
@@ -899,6 +919,8 @@ export default function Home() {
               href="https://www.youtube.com/@05digit" 
               target="_blank" 
               rel="noreferrer" 
+              aria-label="05digit YouTube Channel (opens in new tab)"
+              title="05digit YouTube Channel"
               onClick={() => track("click_footer_youtube")}
               className="hover:text-theme-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#050505] rounded-sm"
             >
