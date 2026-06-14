@@ -1,0 +1,16 @@
+
+> 05dig.it@0.1.0 dev /app
+> next dev
+
+▲ Next.js 16.2.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 546ms
+
+○ Compiling / ...
+ GET / 200 in 5.1s (next.js: 4.5s, application-code: 592ms)
+[browser] Image with src "/songs/deja vu.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+ GET / 200 in 108ms (next.js: 6ms, application-code: 102ms)
+[browser] Image with src "/songs/deja vu.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+ GET / 200 in 92ms (next.js: 4ms, application-code: 88ms)
+[browser] Image with src "/songs/deja vu.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
